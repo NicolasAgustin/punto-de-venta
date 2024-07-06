@@ -9,17 +9,20 @@ import Exceptions.ValidationException;
 import java.sql.SQLException;
 import java.util.List;
 
+import Persistence.Store;
+import java.util.ArrayList;
+
+
 /**
  *
  * @author Nico
  */
 public class ProductosService {
     
-    private final ProductosStore store;
+    private final Store<Producto> store;
     
     public ProductosService() {
-
-        this.store = new ProductosStore();
+        this.store = new Store<Producto>(Producto.class);
         
         Producto[] productos = new Producto[] {
             new Producto(0, 1600, 10, "Jugo de arandanos", "", "0", "proveedor 1", "Alimento", true),
@@ -28,11 +31,10 @@ public class ProductosService {
             new Producto(0, 2500, 10, "Gaseosa pepsi 2.25lt", "", "3", "proveedor 1", "Alimento", true),
             new Producto(0, 1500, 10, "Monster energy", "", "4", "proveedor 1", "Alimento", true),
         }; 
-    
-        for (int i = 0;i < productos.length; i++){
-            this.store.Registrar(productos[i]);
-        }
         
+        for (int i = 0;i < productos.length; i++){
+            this.store.add(productos[i]);
+        }
     }
     
     private void validateProducto(Producto producto) throws ValidationException {
@@ -47,12 +49,28 @@ public class ProductosService {
         
     }
     
-    public Producto fetch(String codigo) throws StoreException {
+    public Producto searchByCodigo(String codigo) throws StoreException {
+    
+        try {
+
+            List<Producto> found = this.store.search("codigo", String.format("'%s'", codigo));
+            
+            if (found.size() == 0) throw new Exception();
+            
+            return found.get(0);
+            
+        } catch (Exception ex) {
+            throw new StoreException("Codigo de barras no reconocido");
+        }
+        
+    }
+    
+    
+    public Producto fetch(int id) throws StoreException {
         // Esto no deberia ser un fetch por id?
         try {
-            Producto request = new Producto();
-            request.setCodigo(codigo);
-            return this.store.Obtener(request);
+            return this.store.fetch(id);
+//              return this.store.fetch();
         } catch (Exception ex) {
             throw new StoreException("Codigo de barras no reconocido");
         }
@@ -63,7 +81,7 @@ public class ProductosService {
         this.validateProducto(producto);
         
         try {
-            this.store.Registrar(producto);
+            this.store.add(producto);
         } catch (Exception ex) {
             throw new StoreException(ex.getMessage());
         }
@@ -72,7 +90,7 @@ public class ProductosService {
     
     public List<Producto> list() throws StoreException {
         try {
-            return this.store.Listar();
+            return this.store.search();
         } catch (Exception ex) {
             throw new StoreException(ex.getMessage());
         }
@@ -83,7 +101,7 @@ public class ProductosService {
         this.validateProducto(producto);
         
         try {
-            this.store.Modificar(producto);
+            this.store.update(producto);
         } catch (Exception ex) {
             throw new StoreException(ex.getMessage());
         }
@@ -93,7 +111,7 @@ public class ProductosService {
     public void delete(Producto producto) throws ValidationException, StoreException {
         
         try {
-            this.store.Eliminar(producto.getId());
+//            this.store.Eliminar(producto.getId());
         } catch (Exception ex) {
             throw new StoreException(ex.getMessage());
         }

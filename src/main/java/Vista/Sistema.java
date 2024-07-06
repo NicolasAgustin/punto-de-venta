@@ -9,7 +9,8 @@ import Exceptions.ValidationException;
 import Modelo.Cliente;
 import Modelo.ClienteDAO;
 import Modelo.MockClienteDAO;
-import Persistence.HibernateUtils;
+import Persistence.HibernateUtil;
+
 
 import java.util.List;
 import javax.swing.JOptionPane;
@@ -100,9 +101,6 @@ public class Sistema extends javax.swing.JFrame {
 
         updateEnabledGroup.add(btnUpdateEnabled);
         updateEnabledGroup.add(btnUpdateEnabled1);
-        
-        Session hibernateSession = HibernateUtils.getSessionFactory().openSession();
-        hibernateSession.beginTransaction();
         
         // Custom model for Products table
         TableProducto.setModel(new DefaultTableModel() {
@@ -317,6 +315,7 @@ public class Sistema extends javax.swing.JFrame {
         PrecioUni = new javax.swing.JTextField();
         btnUpdateEnabled = new javax.swing.JRadioButton();
         btnUpdateEnabled1 = new javax.swing.JRadioButton();
+        labelUpdateID = new javax.swing.JLabel();
         modalDetalle = new javax.swing.JPanel();
         jId = new javax.swing.JTextField();
         jLabel17 = new javax.swing.JLabel();
@@ -642,20 +641,22 @@ public class Sistema extends javax.swing.JFrame {
                     .addGroup(modalUpdateLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                         .addGroup(modalUpdateLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jComboProv, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(modalUpdateLayout.createSequentialGroup()
-                                .addGroup(modalUpdateLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(jLabel16, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jLabel15, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jLabel14, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jLabel13, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(18, 18, 18)
-                                .addGroup(modalUpdateLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(PrecioUni, javax.swing.GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE)
-                                    .addComponent(CantInici)
-                                    .addComponent(Titulo)
-                                    .addComponent(Desc)
-                                    .addComponent(jLabelCod, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                            .addGroup(modalUpdateLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(labelUpdateID)
+                                .addGroup(modalUpdateLayout.createSequentialGroup()
+                                    .addGroup(modalUpdateLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(jLabel16, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(jLabel15, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(jLabel14, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(jLabel13, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGap(18, 18, 18)
+                                    .addGroup(modalUpdateLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(PrecioUni, javax.swing.GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE)
+                                        .addComponent(CantInici)
+                                        .addComponent(Titulo)
+                                        .addComponent(Desc)
+                                        .addComponent(jLabelCod, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
                         .addGroup(modalUpdateLayout.createSequentialGroup()
                             .addGroup(modalUpdateLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                 .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -672,7 +673,9 @@ public class Sistema extends javax.swing.JFrame {
         modalUpdateLayout.setVerticalGroup(
             modalUpdateLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(modalUpdateLayout.createSequentialGroup()
-                .addGap(50, 50, 50)
+                .addGap(16, 16, 16)
+                .addComponent(labelUpdateID)
+                .addGap(18, 18, 18)
                 .addGroup(modalUpdateLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel16)
                     .addComponent(PrecioUni, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -704,7 +707,7 @@ public class Sistema extends javax.swing.JFrame {
                 .addGroup(modalUpdateLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnUpdateEnabled)
                     .addComponent(btnUpdateEnabled1))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 59, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 75, Short.MAX_VALUE)
                 .addGroup(modalUpdateLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(BtnCancelar)
                     .addComponent(btnAceptar))
@@ -1530,7 +1533,6 @@ public class Sistema extends javax.swing.JFrame {
     private void btnSaveProductoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveProductoActionPerformed
         // JENI
         try {
-            int id = 0;
             float precioUnitario = Float.parseFloat(txtPrecioUni.getText());
             int cantidadInicial = Integer.parseInt(txtCantIni.getText());
             String titulo = txtTit.getText();
@@ -1541,12 +1543,15 @@ public class Sistema extends javax.swing.JFrame {
             boolean castEstado = true;
 
             try {
-                productosService.fetch(codigo);
+                // TODO: Se puede cargar un varias veces un producto pero con diferentes proveedores?
+                // o permitimos cargar el producto una sola vez y luego agregar todos los proveedores que querramos?
+                
+                productosService.searchByCodigo(codigo);
                 JOptionPane.showMessageDialog(null, "El producto con el codigo " + codigo + " ya existe.");
                 Limpiarproducto();//limpia
             } catch (Exception ex) {
                 Producto nuevoProducto = new Producto(
-                        id,
+                        0,
                         precioUnitario,
                         cantidadInicial,
                         titulo,
@@ -1559,7 +1564,7 @@ public class Sistema extends javax.swing.JFrame {
                 this.productosService.add(nuevoProducto);
                 LimpiarTable((DefaultTableModel) TableProducto.getModel());
                 LoadProductos();
-                Limpiarproducto();
+                //Limpiarproducto();
             }
 
         } catch (NumberFormatException ex) {
@@ -1614,8 +1619,8 @@ public class Sistema extends javax.swing.JFrame {
             if (cantidad <= 0) {
                 return;
             }
-
-            Producto prodFound = this.productosService.fetch(codigoBarras);
+            
+            Producto prodFound = this.productosService.searchByCodigo(codigoBarras);
             
             if (!prodFound.getHabilitado()) {
                 JOptionPane.showMessageDialog(null, "El producto que se intento agregar se encuentra deshabilitado.");
@@ -1862,7 +1867,7 @@ public class Sistema extends javax.swing.JFrame {
             String selectedProductCode = model.getValueAt(rowIndex, model.findColumn("CODIGO")).toString();
             
             try {
-                Producto found = productosService.fetch(selectedProductCode);
+                Producto found = productosService.searchByCodigo(selectedProductCode);
                 productsToDisable.add(found);
                 // Agregamos el valor de la celda seguido de una coma y un espacio a la cadena
                 productosEliminadosBuilder.append(found.getTitulo()).append(", "); 
@@ -1918,7 +1923,8 @@ public class Sistema extends javax.swing.JFrame {
         String codi = TableProducto.getValueAt(filaSeleccionada, model.findColumn("CODIGO")).toString();
         String proveedor = TableProducto.getValueAt(filaSeleccionada, model.findColumn("PROVEEDOR")).toString();
         String categoria = TableProducto.getValueAt(filaSeleccionada, model.findColumn("CATEGORIA")).toString();
-
+        String ID = TableProducto.getValueAt(filaSeleccionada, model.findColumn("ID")).toString();
+        
         String enabledStatus = TableProducto.getValueAt(filaSeleccionada, model.findColumn("ESTADO")).toString();
         initializeUpdateModal();
 
@@ -1937,6 +1943,9 @@ public class Sistema extends javax.swing.JFrame {
         jLabelCod.setText(codi);
         jComboProv.setSelectedItem(proveedor);
         jComboCat.setSelectedItem(categoria);
+        labelUpdateID.setText(ID);
+        
+        labelUpdateID.setVisible(false);
         
         if (enabledStatus.equals("Habilitado")) {
             btnUpdateEnabled.doClick();
@@ -1987,10 +1996,13 @@ public class Sistema extends javax.swing.JFrame {
         Desc.setBorder(new LineBorder(new Color(245, 245, 245), 2));
         String productoCodigo = jLabelCod.getText();
         
+        int productId = Integer.parseInt(labelUpdateID.getText());
+        
         Producto prodToUpdate = null;
         
         try {
-            prodToUpdate = this.productosService.fetch(productoCodigo);
+            prodToUpdate = this.productosService.fetch(productId);
+            
         } catch(Exception ex) {
             JOptionPane.showMessageDialog(modalUpdateFrame, ex.toString());
             modalUpdateFrame.setVisible(false);
@@ -2338,6 +2350,7 @@ public class Sistema extends javax.swing.JFrame {
     private javax.swing.JTextField jTextField26;
     private javax.swing.JTextField jTotal;
     private javax.swing.JTextField jtxtFiltro;
+    private javax.swing.JLabel labelUpdateID;
     private java.awt.List list1;
     private javax.swing.JButton menuProductosBtn;
     private javax.swing.JButton menuVentasBtn;

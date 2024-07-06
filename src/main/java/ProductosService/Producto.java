@@ -5,8 +5,12 @@
 package ProductosService;
 
 import Modelo.BaseTableModel;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+
 
 /**
  *
@@ -16,28 +20,36 @@ import jakarta.persistence.Id;
 public class Producto implements BaseTableModel {
 
     @Id
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @Column(name="ID")
     private int id;
+    
+    @Column(name="PRECIO_UNITARIO")
     private float precioUnitario;
+    
+    @Column(name="CANTIDAD_INICIAL")
     private int cantidadInicial;
+    
+    @Column(name="TITULO", length=100)
     private String titulo;
+    
+    @Column(name="DESCRIPCION", length=100)
     private String descripcion = null;
+    
+    @Column(name="CODIGO", length=50)
     private String codigo;
+    
+    @Column(name="PROVEEDOR", length=50)
     private String proveedor;
     // TODO: Convertir en enum (ni idea)
+    
+    @Column(name="CATEGORIA", length=50)
     private String categoria;
+    
+    @Column(name="HABILITADO")
     private boolean habilitado;
     
-    public Producto() {
-        id = 0;
-        precioUnitario = 0;
-        cantidadInicial = 0;
-        titulo = "";
-        descripcion = "";
-        codigo = "";
-        proveedor= "";
-        categoria= "";
-        habilitado=true;
-    }
+    public Producto() {}
     
     @Override
     public String toString() {

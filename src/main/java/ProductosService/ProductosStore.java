@@ -10,8 +10,12 @@ import ProductosService.Producto;
 import java.util.ArrayList;
 import java.util.List;
 import Persistence.H2Connector;
+import Persistence.HibernateUtil;
+import jakarta.persistence.criteria.CriteriaQuery;
 import java.sql.SQLException;
 import javax.swing.JOptionPane;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 
 /**
  *
@@ -20,30 +24,64 @@ import javax.swing.JOptionPane;
 public class ProductosStore implements CrudOperations<Producto> {
 
     private List<Producto> store = new ArrayList<>();
+    private SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+  
     private H2Connector DBConnector;
     
     public ProductosStore() {
-        try {
-            this.DBConnector = new H2Connector();
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, ex.getMessage());
+        
+        Session hibernateSession = this.sessionFactory.openSession();
+        hibernateSession.beginTransaction();
+        
+        Producto[] productos = new Producto[] {
+            new Producto(0, 1600, 10, "Jugo de arandanos", "", "0", "proveedor 1", "Alimento", true),
+            new Producto(0, 700, 20, "Leche largavida", "", "1", "proveedor 1", "Alimento", true),
+            new Producto(0, 2500, 10, "Jugo de naranjas", "", "2", "proveedor 1", "Alimento", true),
+            new Producto(0, 2500, 10, "Gaseosa pepsi 2.25lt", "", "3", "proveedor 1", "Alimento", true),
+            new Producto(0, 1500, 10, "Monster energy", "", "4", "proveedor 1", "Alimento", true),
+        }; 
+    
+        for (int i = 0;i < productos.length; i++){
+            hibernateSession.save(productos[i]);
         }
+        
+        hibernateSession.getTransaction().commit();
+        
+        hibernateSession.close();
+        
     }
     
     @Override
     public boolean Registrar(Producto cl) {
-        cl.setId(this.store.size()+1);
-        this.store.add(cl);
+        Session session = this.sessionFactory.openSession();
+        session.beginTransaction();
+        session.save(cl);
+        session.getTransaction().commit();
+        
+        session.close();
         return true;
     }
 
     @Override
     public List Listar() {
-        return this.store;
+        Session session = this.sessionFactory.openSession();
+        session.beginTransaction();
+        
+        List<Producto> productos = session.createQuery("from Producto", Producto.class).list();
+        
+        session.close();
+        
+        return productos;
     }
 
     @Override
     public boolean Eliminar(int id) {
+        Session session = this.sessionFactory.openSession();
+        session.beginTransaction();
+        
+        session.createQuery("delete from Producto", Producto.class).list();
+        
+        session.remove(id);
         for (int i=0; i < this.store.size(); i++){
             if (this.store.get(i).getId() == id){
                 this.store.remove(i);
@@ -89,11 +127,10 @@ public class ProductosStore implements CrudOperations<Producto> {
     
     @Override
     public Producto Obtener(Producto obj) throws StoreException {
-        for (int i=0; i < this.store.size(); i++){
-            if (this.store.get(i).getCodigo().equals(obj.getCodigo())){
-                return this.store.get(i);
-            }
-        }
+        Session session = this.sessionFactory.openSession();
+        session.beginTransaction();
+        
+//        session.get(Producto.class, )
         
         throw new StoreException("");
         // Este metodo deberia tirar una StoreException
