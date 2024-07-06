@@ -103,6 +103,7 @@ public class Sistema extends javax.swing.JFrame {
         updateEnabledGroup.add(btnUpdateEnabled);
         updateEnabledGroup.add(btnUpdateEnabled1);
         
+        // Remove the JTabbedPane header
         principalPanel.setUI(new javax.swing.plaf.metal.MetalTabbedPaneUI() {
             protected void paintTabArea(Graphics g, int tabPlacement, int selectedIndex){}
         });
