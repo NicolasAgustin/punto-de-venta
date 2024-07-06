@@ -23,6 +23,7 @@ import ProductosService.ProductosValidacion;
 import VentasService.ProductoDetalle;
 import VentasService.Venta;
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -78,7 +79,7 @@ public class Sistema extends javax.swing.JFrame {
     JList jList1 = new JList();
     JList jList2 = new JList();
     JList jList3 = new JList();
-
+    
     // Servicio para manejar la creacion y obtencion de ventas
     VentasService ventasService = new VentasService();
     ProductosService productosService = new ProductosService();
@@ -101,6 +102,10 @@ public class Sistema extends javax.swing.JFrame {
 
         updateEnabledGroup.add(btnUpdateEnabled);
         updateEnabledGroup.add(btnUpdateEnabled1);
+        
+        principalPanel.setUI(new javax.swing.plaf.metal.MetalTabbedPaneUI() {
+            protected void paintTabArea(Graphics g, int tabPlacement, int selectedIndex){}
+        });
         
         // Custom model for Products table
         TableProducto.setModel(new DefaultTableModel() {
