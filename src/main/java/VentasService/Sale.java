@@ -5,8 +5,16 @@
 package VentasService;
 
 import Modelo.BaseTableModel;
-import ProductosService.Producto;
-import VentasService.ProductoDetalle;
+import VentasService.Detail;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -19,33 +27,47 @@ import java.util.List;
  * 
  * Este modelo solamente es para mantener la informacion
  */
-public class Venta implements BaseTableModel {
-    private int id;
-    private float total = 0;
-    private List<ProductoDetalle> detalle;
-    // TODO: Agregar clase para la informacion del pago
-    private PaymentInformation paymentInfo;
+@Entity
+@Table(name = "sales")
+public class Sale implements BaseTableModel {
     
-    public Venta() {
-        id = 0;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="id")
+    private Long id;
+    
+    @Column(name="total")
+    private float total = 0;
+    
+    @OneToMany(cascade=CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "sale_id") // Esta columna va a estar en la tabla sale_details
+    private List<Detail> detail;
+    
+    @Column(name="timestamp")
+    private long timestamp;
+    
+    @Column(name="currency")
+    private String currency;
+    
+    @Column(name="amount")
+    private float amount;
+    
+    public Sale() {
+        id = new Long(0);
         total = 0;
-        detalle = new ArrayList<>();
+        detail = new ArrayList<>();
     }
     
-    public Venta(int id, int total, String compradorDNI, List<ProductoDetalle> detalle) {
+    public Sale(Long id, int total, String compradorDNI, List<Detail> detail) {
         this.id = id;
         this.total = total;
-        this.detalle = detalle;
+        this.detail = detail;
     }
     
     /////// ESTA LOGICA DEBERIA ESTAR EN VENTAS-SERVICE
-    public void addDetalle(ProductoDetalle prod) {
-        this.detalle.add(prod);
+    public void addDetail(Detail prod) {
+        this.detail.add(prod);
         this.total += prod.getTotal();
-    }
-    
-    public void setPaymentInformation(PaymentInformation paymentInfo) {
-        this.paymentInfo = paymentInfo;
     }
     
 //    public void removeProduct(String codigo) {
@@ -82,15 +104,15 @@ public class Venta implements BaseTableModel {
     
     /////////////////////////////////////////////////////////////////////
 
-    public List<ProductoDetalle> getDetalle() {
-        return this.detalle;
+    public List<Detail> getDetail() {
+        return this.detail;
     }
     
-    public void setDetalle(List<ProductoDetalle> detalle) {
-        this.detalle = detalle;
+    public void setDetail(List<Detail> detail) {
+        this.detail = detail;
     }
     
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
@@ -102,7 +124,7 @@ public class Venta implements BaseTableModel {
         return this.total;
     }
     
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -113,15 +135,13 @@ public class Venta implements BaseTableModel {
         
         return new Object[]{
             this.id,
-            this.paymentInfo.getAmount(), //total
-            df.format(new Date(this.paymentInfo.getTimestamp())),//fecha
-            this.paymentInfo.getCurrency(), //moneda
-            this.paymentInfo.getRef(),
-            this.paymentInfo.getLocation()
+            this.amount, //total
+            df.format(new Date(this.timestamp)),//fecha
+            this.currency //moneda
         };
     }
     
     public static final String[] getColumnNames() {
-        return new String[]{ "ID", "TOTAL", "FECHA", "MONEDA", "REFERENCIA", "LOCALIZACION" };
+        return new String[]{ "ID", "TOTAL", "FECHA", "MONEDA" };
     }
 }

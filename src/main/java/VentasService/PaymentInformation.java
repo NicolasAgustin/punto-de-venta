@@ -19,8 +19,6 @@ public class PaymentInformation {
     
     private String currency;
     private float amount;
-    private String ref;
-    private String location;
 
     public long getTimestamp() {
         return timestamp;
@@ -46,22 +44,6 @@ public class PaymentInformation {
         this.amount = amount;
     }
 
-    public String getRef() {
-        return ref;
-    }
-
-    public void setRef(String ref) {
-        this.ref = ref;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
     public PaymentProcessor getProcessor() {
         return processor;
     }
@@ -84,8 +66,6 @@ public class PaymentInformation {
         
         this.currency = currency;
         this.amount = amount;
-        this.ref = ref;
-        this.location = location;
         
         // En base a este tipo instanciar mediante un strategy
         // un procesador de pago
@@ -126,7 +106,7 @@ public class PaymentInformation {
     
     @Override
     public String toString() {
-        return ref + " " + location + " " + amount + " " + currency;
+        return " " + amount + " " + currency;
     }
     
 }
