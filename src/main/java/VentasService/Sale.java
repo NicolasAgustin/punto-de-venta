@@ -49,9 +49,6 @@ public class Sale implements BaseTableModel {
     @Column(name="currency")
     private String currency;
     
-    @Column(name="amount")
-    private float amount;
-    
     public Sale() {
         id = new Long(0);
         total = 0;

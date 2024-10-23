@@ -17,11 +17,11 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import VentasService.VentasService;
 
-import ProductosService.Producto;
-import ProductosService.ProductosService;
+import ProductosService.Product;
+import ProductosService.ProductsService;
 import ProductosService.ProductosValidacion;
-import VentasService.ProductoDetalle;
-import VentasService.Venta;
+//import VentasService.ProductoDetalle;
+import VentasService.Sale;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
@@ -82,12 +82,12 @@ public class Sistema extends javax.swing.JFrame {
     
     // Servicio para manejar la creacion y obtencion de ventas
     VentasService ventasService = new VentasService();
-    ProductosService productosService = new ProductosService();
+    ProductsService productosService = new ProductsService();
     JFrame modalFrame = new JFrame();
      JFrame modalVentaFrame = new JFrame();
     JFrame modalUpdateFrame = new JFrame();
     JDialog modalDialog;
-    Venta tmpVenta = new Venta();
+    Sale tmpVenta = new Sale();
 
     //Boton eliminar:
     JButton botonEliminar = new JButton("btnEliminarpro");
@@ -110,7 +110,7 @@ public class Sistema extends javax.swing.JFrame {
         
         // Custom model for Products table
         TableProducto.setModel(new DefaultTableModel() {
-            String[] columns = Producto.getColumnNames();
+            String[] columns = Product.getColumnNames();
 
             @Override
             public int getColumnCount() {
