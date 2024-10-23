@@ -92,10 +92,6 @@ public class ProductosStore implements CrudOperations<Product> {
         } finally {
             if (em != null) em.close();
         }
-
-        
-        
-        
     }
 
     @Override

@@ -132,7 +132,7 @@ public class Sale implements BaseTableModel {
         
         return new Object[]{
             this.id,
-            this.amount, //total
+            this.total, //total
             df.format(new Date(this.timestamp)),//fecha
             this.currency //moneda
         };
