@@ -17,6 +17,7 @@ import java.util.ArrayList;
  *
  * @author Nico
  */
+
 public class ProductsService {
     
     private final Store<Product> store;
@@ -66,13 +67,16 @@ public class ProductsService {
     }
     
     
-    public Product fetch(int id) throws StoreException {
+    public Product fetch(Long id) throws StoreException {
         // Esto no deberia ser un fetch por id?
         try {
-            return this.store.fetch(id);
-//              return this.store.fetch();
+            Product found = this.store.fetch(id);
+            
+            if (found == null) throw new StoreException("Codigo de barras no reconocido");
+
+            return found;
         } catch (Exception ex) {
-            throw new StoreException("Codigo de barras no reconocido");
+            throw new StoreException(ex.toString());
         }
     }
     
@@ -90,7 +94,7 @@ public class ProductsService {
     
     public List<Product> list() throws StoreException {
         try {
-            return this.store.search();
+            return this.store.list();
         } catch (Exception ex) {
             throw new StoreException(ex.getMessage());
         }
@@ -112,6 +116,7 @@ public class ProductsService {
         
         try {
 //            this.store.Eliminar(producto.getId());
+              this.store.delete(producto);
         } catch (Exception ex) {
             throw new StoreException(ex.getMessage());
         }

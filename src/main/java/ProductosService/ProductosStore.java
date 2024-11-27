@@ -15,6 +15,7 @@ import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.transaction.Transactional;
 import java.sql.SQLException;
 import javax.swing.JOptionPane;
 import org.hibernate.Session;
@@ -24,6 +25,7 @@ import org.hibernate.SessionFactory;
  *
  * @author Nico
  */
+@Deprecated
 public class ProductosStore implements CrudOperations<Product> {
 
     private List<Product> store = new ArrayList<>();
@@ -58,27 +60,26 @@ public class ProductosStore implements CrudOperations<Product> {
     }
     
     @Override
-    public boolean Registrar(Product cl) {
-        Session session = this.sessionFactory.openSession();
-        session.beginTransaction();
-        session.save(cl);
-        session.getTransaction().commit();
+    public boolean save(Product cl) {
+        EntityManager em = null;
+
+        try {
+            em = this.emf.createEntityManager();
         
-        session.close();
-        return true;
+            em.getTransaction().begin();
+            em.persist(cl);
+            
+            return true;
+            
+        } catch (Exception ex) { 
+            return false;
+        } finally {
+            if (em != null) em.close();
+        }
     }
 
     @Override
-    public List Listar() {
-//        Session session = this.sessionFactory.openSession();
-//        
-//        session.beginTransaction();
-//        
-//        List<Producto> productos = session.createQuery("from Producto", Producto.class).list();
-//        
-//        session.close();
-//        
-//        return productos;
+    public List list() {
 
         EntityManager em = null;
 
@@ -95,38 +96,42 @@ public class ProductosStore implements CrudOperations<Product> {
     }
 
     @Override
-    public boolean Eliminar(int id) {
-        Session session = this.sessionFactory.openSession();
-        session.beginTransaction();
+    public boolean delete(Long id) {
         
-        session.createQuery("delete from Producto", Producto.class).list();
-        
-        session.remove(id);
-        for (int i=0; i < this.store.size(); i++){
-            if (this.store.get(i).getId() == id){
-                this.store.remove(i);
-                return true;
-            }
+        EntityManager em = null;
+        try {
+            em = this.emf.createEntityManager();
+            Product prod = em.find(Product.class, id);
+            
+            if (prod != null) em.remove(prod);
+            
+            return true;
+            
+        } catch(Exception ex) {
+            return false;
         }
-        
-        return false;
     }
 
     @Override
-    public boolean Modificar(Producto cl) {
+    public boolean update(Long id, Product cl) {
+        
+        EntityManager em = null;
         try {
-            int index = this.GetIndexByCode(cl.getCodigo());
+            em = this.emf.createEntityManager();
+            Product prod = em.find(Product.class, id);
             
-            Producto p = this.store.get(index);
+            if (prod == null) throw new Exception("El producto con id " + id + " no existe");
             
-            p.setCantidadInicial(cl.getCantidadInicial());
-            p.setCategoria(cl.getCategoria());
-            p.setCodigo(cl.getCodigo());
-            p.setDescripcion(cl.getDescripcion());
-            p.setHabilitado(cl.getHabilitado());
-            p.setPrecioUnitario(cl.getPrecioUnitario());
-            p.setProveedor(cl.getProveedor());
-            p.setTitulo(cl.getTitulo());
+            prod.setInitialQuantity(cl.getInitialQuantity());
+            prod.setCategory(cl.getCategory());
+            prod.setCode(cl.getCode());
+            prod.setDescription(cl.getDescription());
+            prod.setEnabled(cl.getEnabled());
+            prod.setUnitaryPrice(cl.getUnitaryPrice());
+            prod.setProvider(cl.getProvider());
+            prod.setTitle(cl.getTitle());
+            
+            em.merge(prod);
             
             return true;
             
@@ -135,29 +140,22 @@ public class ProductosStore implements CrudOperations<Product> {
         }
         
     }
-
-    private int GetIndexByCode(String codigo) throws StoreException {
-        for (int i=0; i < this.store.size(); i++){
-            if (this.store.get(i).getCodigo().equals(codigo)){
-                return i;
-            }
-        }
-        throw new StoreException("");
-    }
     
     @Override
-    public Producto Obtener(Producto obj) throws StoreException {
-        Session session = this.sessionFactory.openSession();
-        session.beginTransaction();
+    public Product fetch(Long id) throws StoreException {
+        EntityManager em = null;
         
-//        session.get(Producto.class, )
-        
-        throw new StoreException("");
-        // Este metodo deberia tirar una StoreException
-        // Pero si agrego eso no cumple la interfaz
-        // modificar la interfaz o cambiar el manejo de errores
-        
-//        throw new StoreException("No se encuentra el producto con codigo: " + obj.getCodigo());
+        try {
+            em = this.emf.createEntityManager();
+            Product prod = em.find(Product.class, id);
+            
+            if (prod == null) throw new Exception("El producto con id " + id + " no existe");
+            
+            return prod;
+            
+        } catch (Exception ex) {
+            throw new StoreException("El producto con id " + id + " no existe");
+        }
     }
     
     

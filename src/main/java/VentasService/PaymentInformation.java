@@ -61,11 +61,11 @@ public class PaymentInformation {
     // no tiene que procesar el pago.
     private PaymentProcessor processor;
     
-    public PaymentInformation(String method, String currency, float amount, String ref, String location) {
+    public PaymentInformation(String method, Sale sale) {
         this.timestamp = Instant.now().toEpochMilli();
         
-        this.currency = currency;
-        this.amount = amount;
+        this.currency = sale.getCurrency();
+        this.amount = sale.getTotal();
         
         // En base a este tipo instanciar mediante un strategy
         // un procesador de pago

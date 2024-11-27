@@ -4,7 +4,6 @@
  */
 package Persistence;
 
-import ProductosService.Producto;
 import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -20,6 +19,9 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import java.util.ArrayList;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Persistence;
+import jakarta.persistence.EntityManager;
 
 /**
  *
@@ -28,10 +30,8 @@ import java.util.ArrayList;
  */
 public class Store<T> {
     
-    @PersistenceUnit(unitName="orderMgt")
-    private EntityManagerFactory entityManagerFactory;
-    
     private SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+    private EntityManagerFactory emf = Persistence.createEntityManagerFactory("default");
     
     final Class<T> typeClass;
     
@@ -40,44 +40,57 @@ public class Store<T> {
     }
     
     public boolean add(T entity) {
-        Session session = this.sessionFactory.openSession();
-        session.beginTransaction();
         
-        session.save(entity);
+        EntityManager em = null;
         
-        session.getTransaction().commit();
+        try {
+            
+            em = this.emf.createEntityManager();
         
-        session.close();
-        
-        return true;
+            em.getTransaction().begin();
+            em.persist(entity);
+            
+            return true;
+            
+        } catch (Exception ex) {
+            return false;
+        }
     }
     
+    public List<T> list() {
+    
+        EntityManager em = null;
+
+        try {
+            em = this.emf.createEntityManager();
+        
+            em.getTransaction().begin();
+            
+            return em.createQuery("from " + this.typeClass.getName(), this.typeClass).getResultList();
+        } catch (Exception ex) { 
+            return new ArrayList<T>();
+        } finally {
+            if (em != null) em.close();
+        }
+        
+    }
     
     public List<T> search(String columnName, Object value) {
         
         String query = "FROM " + this.typeClass.getSimpleName() + " t WHERE t." + columnName + " = " + value;
         
-        Session session = null;
+        EntityManager em = null;
         
         try {
-
-            session = this.sessionFactory.openSession();
-            session.beginTransaction();
-        
-        
-            Query cQuery = session.createQuery(query);
             
-            return cQuery.getResultList();
+            em = this.emf.createEntityManager();
+            em.getTransaction().begin();
+            return em.createQuery(query, this.typeClass).getResultList();
         } catch (Exception ex) {
             
             System.out.println(ex.toString());
             
-            return new ArrayList<T>();
-            
-        } finally {
-            
-            if (session != null) session.close();
-            
+            return new ArrayList<T>();   
         }
         
     }
@@ -103,50 +116,81 @@ public class Store<T> {
 //    }
     
     
-    public List<T> search() {
-        // TODO: Agregar soporte para filtros
-        Session session = this.sessionFactory.openSession();
-        session.beginTransaction();
-        
-        List<T> entities = session.createQuery("from " + this.typeClass.getSimpleName(), this.typeClass).list();
-        
-        session.close();
-        
-        return entities;
-    }
+//    public List<T> search() {
+//        // TODO: Agregar soporte para filtros
+//        Session session = this.sessionFactory.openSession();
+//        session.beginTransaction();
+//        
+//        List<T> entities = session.createQuery("from " + this.typeClass.getSimpleName(), this.typeClass).list();
+//        
+//        session.close();
+//        
+//        return entities;
+//    }
     
     public void update(T entity) {
         // Revisar
-        Session session = this.sessionFactory.openSession();
-        session.beginTransaction();
+//        Session session = this.sessionFactory.openSession();
+//        session.beginTransaction();
+//        
+//        session.merge(entity);
+//        
+//        session.getTransaction().commit();
+//        
+//        session.close();
+
+        EntityManager em = null;
         
-        session.merge(entity);
-        
-        session.getTransaction().commit();
-        
-        session.close();
+        try {
+            em = this.emf.createEntityManager();
+            
+            em.merge(entity);
+            
+        } catch (Exception ex) {}
+
     }
     
     public void delete(T entity) {
-        Session session = this.sessionFactory.openSession();
-        session.beginTransaction();
-        
-        session.remove(entity);
-        
-        session.getTransaction().commit();
-        
-        session.close();
+//        Session session = this.sessionFactory.openSession();
+//        session.beginTransaction();
+//        
+//        session.remove(entity);
+//        
+//        session.getTransaction().commit();
+//        
+//        session.close();
+
+        EntityManager em = null;
+        try {
+            em = this.emf.createEntityManager();
+            
+            em.remove(entity);
+            
+        } catch(Exception ex) {}
     }
     
-    public T fetch(int id) {
-        Session session = this.sessionFactory.openSession();
-        session.beginTransaction();
+    public T fetch(Long id) {
+//        Session session = this.sessionFactory.openSession();
+//        session.beginTransaction();
+//        
+//        T entity = session.get(this.typeClass, id);
+//        
+//        session.close();
+//        
+//        return entity;
+        EntityManager em = null;
         
-        T entity = session.get(this.typeClass, id);
-        
-        session.close();
-        
-        return entity;
+        try {
+            em = this.emf.createEntityManager();
+            T entityFound = em.find(this.typeClass, id);
+            
+            if (entityFound == null) return null;
+            
+            return entityFound;
+            
+        } catch (Exception ex) {
+            return null;
+        }
     }
     
 }

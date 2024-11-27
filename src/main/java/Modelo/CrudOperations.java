@@ -13,9 +13,9 @@ import java.util.List;
  * @param <T>
  */
 public interface CrudOperations <T> {
-    boolean Registrar(T cl);
-    List Listar();
-    boolean Eliminar(int id);
-    boolean Modificar(T cl);
-    T Obtener(T obj) throws StoreException;
+    boolean save(T cl);
+    List list();
+    boolean delete(Long id);
+    boolean update(Long id, T cl);
+    T fetch(Long id) throws StoreException;
 }

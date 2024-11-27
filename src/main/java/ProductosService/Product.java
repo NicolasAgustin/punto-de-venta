@@ -116,7 +116,7 @@ public class Product implements BaseTableModel {
         return id;
     }
 
-    public void setPrecioUnitario(float unitaryPrice){
+    public void setUnitaryPrice(float unitaryPrice){
         this.unitaryPrice = unitaryPrice;
     }
     

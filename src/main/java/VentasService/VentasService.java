@@ -4,15 +4,18 @@
  */
 package VentasService;
 
-import VentasService.VentasStore;
-import VentasService.Venta;
+//import VentasService.VentasStore;
+import VentasService.Sale;
+import VentasService.Detail;
 import Utils.Validator;
 import Exceptions.ValidationException;
 import Exceptions.StoreException;
-import ProductosService.Producto;
+import ProductosService.Product;
 import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
+import Persistence.Store;
+import java.time.Instant;
 
 /**
  *
@@ -23,7 +26,10 @@ import java.util.UUID;
  */
 
 public class VentasService {
-    private VentasStore store = new VentasStore();
+//    private VentasStore store = new VentasStore();
+    
+    private Store<Sale> store = new Store(Sale.class);
+    
     private BillerConnector billerConnector = new BillerConnector();
     
     public static final float IVA_PERCENTAGE = 21;
@@ -34,13 +40,13 @@ public class VentasService {
     
     }
     
-    private void validateVenta(Venta venta) throws ValidationException, StoreException {
+    private void validateVenta(Sale sale) throws ValidationException, StoreException {
         // No se van a guardar datos del cliente en las ventas a
         // excepcion de los pagos con tarjetas
 //        if (!Validator.isDniValid(venta.getCompradorDni()))
 //            throw new ValidationException("El dni no es valido.");
         
-        if (venta.getTotal() < 0.0)
+        if (sale.getTotal() < 0.0)
             throw new ValidationException("El monto no puede ser negativo.");
     }
     
@@ -48,18 +54,18 @@ public class VentasService {
         return amount * (float) (IVA_PERCENTAGE / 100.0);
     }
     
-    public ProductoDetalle createDetalle(Producto found, int cantidad) {
-        float subtotal = found.getPrecioUnitario() * cantidad;
+    public Detail createDetalle(Product found, int cantidad) {
+        float subtotal = found.getUnitaryPrice() * cantidad;
         float total = subtotal + this.calculateIva(subtotal);
-        return new ProductoDetalle(found, cantidad, 0, subtotal, IVA_PERCENTAGE, total);
+        return new Detail(found, cantidad, 0, subtotal, IVA_PERCENTAGE, total);
     }
     
-    public void addDetalleToVenta(Venta venta, ProductoDetalle detalle) {
-        venta.getDetalle().add(detalle);
-        venta.setTotal(venta.getTotal() + detalle.getTotal());
+    public void addDetalleToVenta(Sale sale, Detail detail) {
+        sale.getDetail().add(detail);
+        sale.setTotal(sale.getTotal() + detail.getTotal());
     }
     
-    public boolean updateDetalleIfDuplicated(List<ProductoDetalle> collected, ProductoDetalle toCheck, Venta currentVenta) {
+    public boolean updateDetalleIfDuplicated(List<Detail> collected, Detail toCheck, Sale currentSale) {
         if (!collected.contains(toCheck)) {
             return false;
             
@@ -67,13 +73,13 @@ public class VentasService {
         
         int index = collected.indexOf(toCheck);
         collected.get(index).add(toCheck);
-        currentVenta.setTotal(currentVenta.getTotal() + toCheck.getTotal());
+        currentSale.setTotal(currentSale.getTotal() + toCheck.getTotal());
         return true;
     }
     
-    public Venta removeProductoFromDetalle(Venta venta, String codigo) {
+    public Sale removeProductoFromDetalle(Sale sale, String codigo) {
     
-        List<ProductoDetalle> detalleList = venta.getDetalle();
+        List<Detail> detalleList = sale.getDetail();
         
         int indexToRemove = -1;
         boolean flagRemove = false;
@@ -81,28 +87,28 @@ public class VentasService {
         // Search across all detail
         for (int i = 0; i < detalleList.size(); i++){
             
-            ProductoDetalle pDetalle = detalleList.get(i);
+            Detail pDetalle = detalleList.get(i);
             
             // Check if code is equals
-            if (pDetalle.getCodigo().equals(codigo)){
+            if (pDetalle.getCode().equals(codigo)){
                 
                 // If quantity is greater than 1 then we must only decrease quantity
                 // but not remove element
-                if (pDetalle.getCantidad() > 1) {
-                    pDetalle.setCantidad(pDetalle.getCantidad() - 1);
+                if (pDetalle.getQuantity() > 1) {
+                    pDetalle.setCantidad(pDetalle.getQuantity() - 1);
                     
                     // Must re calculate total and subtotal
-                    float pricePerItemToRemove = pDetalle.getProducto().getPrecioUnitario() + 
-                            this.calculateIva(pDetalle.getProducto().getPrecioUnitario());
+                    float pricePerItemToRemove = pDetalle.getProducto().getUnitaryPrice() + 
+                            this.calculateIva(pDetalle.getProducto().getUnitaryPrice());
                     float newTotal = (pDetalle.getTotal() - pricePerItemToRemove);
                     
-                    float newSubtotal = pDetalle.getSubtotal() - pDetalle.getProducto().getPrecioUnitario();
+                    float newSubtotal = pDetalle.getSubtotal() - pDetalle.getProducto().getUnitaryPrice();
                     
                     pDetalle.setSubtotal(newSubtotal);
                     pDetalle.setTotal(newTotal);
                     
                     // Also sale total
-                    venta.setTotal(venta.getTotal() - pricePerItemToRemove);
+                    sale.setTotal(sale.getTotal() - pricePerItemToRemove);
                     
                     break;
                 }
@@ -115,30 +121,32 @@ public class VentasService {
         }
         
         if (flagRemove) {
-            venta.setTotal(venta.getTotal() - detalleList.get(indexToRemove).getTotal());
+            sale.setTotal(sale.getTotal() - detalleList.get(indexToRemove).getTotal());
             detalleList.remove(indexToRemove);
-            venta.setDetalle(detalleList);
+            sale.setDetail(detalleList);
         }
     
-        return venta;
+        return sale;
     }
     
-    public void add(Venta venta, String method) throws ValidationException, StoreException {
+    public void add(Sale sale, String method) throws ValidationException, StoreException {
         
-        this.validateVenta(venta);
+        this.validateVenta(sale);
         
         UUID uuid = UUID.randomUUID();
         
         // Procesar pago
-        PaymentInformation paymentInfo = new PaymentInformation(method, "ARS", venta.getTotal(), uuid.toString(), "Argentina");
+        PaymentInformation paymentInfo = new PaymentInformation(method, sale);
         paymentInfo.processPayment();
         
         // Enviar informacion para facturacion etc
-        venta.setPaymentInformation(paymentInfo);
+//        sale.setPaymentInformation(paymentInfo);
+        
         billerConnector.createInvoice();
         
         try {
-            this.store.Registrar(venta);
+            sale.setTimestamp(Instant.now().toEpochMilli());
+            this.store.add(sale);
         } catch(Exception ex) {
             throw new StoreException(ex.getMessage());
         }
@@ -150,28 +158,26 @@ public class VentasService {
 //        // No puede ocurrir
 //    }
     
-    public void update(Venta venta) throws ValidationException, StoreException {
-        this.validateVenta(venta);
+    public void update(Sale sale) throws ValidationException, StoreException {
+        this.validateVenta(sale);
         
         try {
-            this.store.Modificar(venta);
+            this.store.update(sale);
         } catch(Exception ex) {
             throw new StoreException(ex.getMessage());
         }
     }
     
-    public List<Venta> list() throws StoreException {
+    public List<Sale> list() throws StoreException {
         try {
-            return this.store.Listar();
+            return this.store.list();
         } catch(Exception ex) {
             throw new StoreException(ex.getMessage());
         }
     }
-    public Venta fetch(int id) throws StoreException {
+    public Sale fetch(Long id) throws StoreException {
         try {
-            Venta request = new Venta();
-            request.setId(id);
-            return this.store.Obtener(request);
+            return this.store.fetch(id);
         } catch (Exception ex) {
             throw new StoreException("Codigo de barras no reconocido");
         }

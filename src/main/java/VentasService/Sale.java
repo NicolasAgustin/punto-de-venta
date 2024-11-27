@@ -105,6 +105,14 @@ public class Sale implements BaseTableModel {
         return this.detail;
     }
     
+    public String getCurrency() {
+        return this.currency;
+    }
+    
+    public void setCurrency(String currency) {
+        this.currency = currency;
+    }
+    
     public void setDetail(List<Detail> detail) {
         this.detail = detail;
     }
@@ -124,6 +132,15 @@ public class Sale implements BaseTableModel {
     public void setId(Long id) {
         this.id = id;
     }
+    
+    public long getTimestamp() {
+        return this.timestamp;
+    }
+    
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
+    
 
     @Override
     public Object[] toArray() {
