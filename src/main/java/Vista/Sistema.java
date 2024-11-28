@@ -20,6 +20,7 @@ import VentasService.VentasService;
 import ProductosService.Product;
 import ProductosService.ProductsService;
 import ProductosService.ProductosValidacion;
+import VentasService.Detail;
 //import VentasService.ProductoDetalle;
 import VentasService.Sale;
 import java.awt.Color;
@@ -125,7 +126,7 @@ public class Sistema extends javax.swing.JFrame {
 
         // Custom model for Ventas table
         TableVenta.setModel(new DefaultTableModel() {
-            String[] columns = ProductoDetalle.getColumnNames();
+            String[] columns = Detail.getColumnNames();
 
             @Override
             public int getColumnCount() {
@@ -140,7 +141,7 @@ public class Sistema extends javax.swing.JFrame {
         
         // Custom model for Venta detalle table
         TableVentaDetalle.setModel(new DefaultTableModel() {
-            String[] columns = ProductoDetalle.getColumnNames();
+            String[] columns = Detail.getColumnNames();
 
             @Override
             public int getColumnCount() {
@@ -240,19 +241,19 @@ public class Sistema extends javax.swing.JFrame {
         TableVentasHistorico.setModel(modelo);
     }
 
-    public void LoadDetalle(List<ProductoDetalle> detalle) {
+    public void LoadDetalle(List<Detail> detalle) {
         ClearTableVenta();
         detalle.forEach(prod -> AddDetalleProducto(prod));
     }
     
-    public void LoadVentaDetalle(List<ProductoDetalle> detalle) {
+    public void LoadVentaDetalle(List<Detail> detalle) {
         ClearTableVenta();
         DefaultTableModel dtm = (DefaultTableModel) TableVentaDetalle.getModel();
         dtm.setRowCount(0);
         
         modelo = (DefaultTableModel) TableVentaDetalle.getModel();
         
-        for (ProductoDetalle pDetalle: detalle) {
+        for (Detail pDetalle: detalle) {
             Object[] toAdd = pDetalle.toObject();
             
             modelo.addRow(toAdd);
@@ -262,7 +263,7 @@ public class Sistema extends javax.swing.JFrame {
         
     }
 
-    public void AddDetalleProducto(ProductoDetalle prodDetalle) {
+    public void AddDetalleProducto(Detail prodDetalle) {
         Object[] toAdd = prodDetalle.toObject();
 
         modelo = (DefaultTableModel) TableVenta.getModel();
@@ -1426,7 +1427,7 @@ public class Sistema extends javax.swing.JFrame {
         // TODO add your handling code here:
 
         principalPanel.setSelectedIndex(0);
-        this.tmpVenta = new Venta();
+        this.tmpVenta = new Sale();
     }//GEN-LAST:event_menuVentasBtnActionPerformed
 
     private void btnLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarActionPerformed
@@ -1502,19 +1503,19 @@ public class Sistema extends javax.swing.JFrame {
 
         }
         
-        List<ProductoDetalle> detalle = this.tmpVenta.getDetalle();
+        List<Detail> detalle = this.tmpVenta.getDetail();
         
-        for (ProductoDetalle prod:  detalle) {
-            Producto updateRequest = prod.getProducto();
+        for (Detail prod:  detalle) {
+            Product updateRequest = prod.getProducto();
 
             // La validacion de la cantidad de los productos se hace al momento de ingresar el
             // codigo y la cantidad del producto
 
             // updateRequest.getCantidadInicial deberia ser siempre mayor o igual que la cantidad
             // del detalle
-            int newQuantity = Math.abs(updateRequest.getCantidadInicial() - prod.getCantidad());
+            int newQuantity = Math.abs(updateRequest.getInitialQuantity() - prod.getQuantity());
             
-            updateRequest.setCantidadInicial(newQuantity);
+            updateRequest.setInitialQuantity(newQuantity);
             try {
                 productosService.update(updateRequest);
             } catch (Exception ex) {
@@ -1556,7 +1557,7 @@ public class Sistema extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(null, "El producto con el codigo " + codigo + " ya existe.");
                 Limpiarproducto();//limpia
             } catch (Exception ex) {
-                Producto nuevoProducto = new Producto(
+                Product nuevoProducto = new Product(
                         0,
                         precioUnitario,
                         cantidadInicial,
@@ -1626,28 +1627,28 @@ public class Sistema extends javax.swing.JFrame {
                 return;
             }
             
-            Producto prodFound = this.productosService.searchByCodigo(codigoBarras);
+            Product prodFound = this.productosService.searchByCodigo(codigoBarras);
             
-            if (!prodFound.getHabilitado()) {
+            if (!prodFound.getEnabled()) {
                 JOptionPane.showMessageDialog(null, "El producto que se intento agregar se encuentra deshabilitado.");
                 return;
             }
             
-            if (prodFound.getCantidadInicial() < cantidad) {
+            if (prodFound.getInitialQuantity() < cantidad) {
                 JOptionPane.showMessageDialog(null, "No se puede agregar el producto, stock insuficiente.");
                 return;
             }
             
-            ProductoDetalle detalle = this.ventasService.createDetalle(prodFound, cantidad);
+            Detail detalle = this.ventasService.createDetalle(prodFound, cantidad);
 
             // Revisamos si hay que juntar el detalle con otro existente
             // ej: agregamos dos productos iguales
-            if (!ventasService.updateDetalleIfDuplicated(this.tmpVenta.getDetalle(), detalle, tmpVenta)) {
+            if (!ventasService.updateDetalleIfDuplicated(this.tmpVenta.getDetail(), detalle, tmpVenta)) {
                 // Add detail to tmp sale
-                this.tmpVenta.addDetalle(detalle);
+                this.tmpVenta.addDetail(detalle);
             }
 //            this.AddDetalleProducto(detalle);
-            LoadDetalle(this.tmpVenta.getDetalle());
+            LoadDetalle(this.tmpVenta.getDetail());
 
             // TODO: No se actualiza el total de la venta cuando se agrupan dos productos iguales
             LabelTotal.setText(String.valueOf(this.tmpVenta.getTotal()));
@@ -1735,7 +1736,7 @@ public class Sistema extends javax.swing.JFrame {
         }
 
         //        AddDetalleProducto(this.tmpVenta.getDetalle());
-        this.LoadDetalle(this.tmpVenta.getDetalle());
+        this.LoadDetalle(this.tmpVenta.getDetail());
 
         // Update amount
         String valorVenta = String.valueOf(this.tmpVenta.getTotal());
@@ -1866,17 +1867,17 @@ public class Sistema extends javax.swing.JFrame {
 
         // Usamos StringBuilder para construir la cadena de productos eliminados
         StringBuilder productosEliminadosBuilder = new StringBuilder();
-        List<Producto> productsToDisable = new ArrayList<>();
+        List<Product> productsToDisable = new ArrayList<>();
 
         for (int row: TableProducto.getSelectedRows()) {
             int rowIndex = TableProducto.convertRowIndexToModel(row);
             String selectedProductCode = model.getValueAt(rowIndex, model.findColumn("CODIGO")).toString();
             
             try {
-                Producto found = productosService.searchByCodigo(selectedProductCode);
+                Product found = productosService.searchByCodigo(selectedProductCode);
                 productsToDisable.add(found);
                 // Agregamos el valor de la celda seguido de una coma y un espacio a la cadena
-                productosEliminadosBuilder.append(found.getTitulo()).append(", "); 
+                productosEliminadosBuilder.append(found.getTitle()).append(", "); 
             } catch (Exception ex) {}
             
         }
@@ -1887,8 +1888,8 @@ public class Sistema extends javax.swing.JFrame {
 
         if (confirmacion == JOptionPane.YES_OPTION) {
             
-            for (Producto toDisable: productsToDisable) {
-                toDisable.setHabilitado(false);
+            for (Product toDisable: productsToDisable) {
+                toDisable.setEnabled(false);
                 try {
                     productosService.update(toDisable);
                 } catch (Exception ex) {}
@@ -1925,7 +1926,12 @@ public class Sistema extends javax.swing.JFrame {
         String precioUni = TableProducto.getValueAt(filaSeleccionada, model.findColumn("PRECIO UNITARIO")).toString();
         String cantIni = TableProducto.getValueAt(filaSeleccionada, model.findColumn("CANTIDAD INICIAL")).toString();
         String titulo = TableProducto.getValueAt(filaSeleccionada, model.findColumn("TITULO")).toString();
-        String desc = TableProducto.getValueAt(filaSeleccionada, model.findColumn("DESCRIPCION")).toString();
+        
+        Object descValue = TableProducto.getValueAt(filaSeleccionada, model.findColumn("DESCRIPCION"));
+        
+        if (descValue == null) descValue = "";
+        String desc = descValue.toString();
+        
         String codi = TableProducto.getValueAt(filaSeleccionada, model.findColumn("CODIGO")).toString();
         String proveedor = TableProducto.getValueAt(filaSeleccionada, model.findColumn("PROVEEDOR")).toString();
         String categoria = TableProducto.getValueAt(filaSeleccionada, model.findColumn("CATEGORIA")).toString();
@@ -2002,9 +2008,10 @@ public class Sistema extends javax.swing.JFrame {
         Desc.setBorder(new LineBorder(new Color(245, 245, 245), 2));
         String productoCodigo = jLabelCod.getText();
         
-        int productId = Integer.parseInt(labelUpdateID.getText());
+//        int productId = Integer.parseInt(labelUpdateID.getText());
+        Long productId = Long.parseLong(labelUpdateID.getText());
         
-        Producto prodToUpdate = null;
+        Product prodToUpdate = null;
         
         try {
             prodToUpdate = this.productosService.fetch(productId);
@@ -2019,13 +2026,13 @@ public class Sistema extends javax.swing.JFrame {
 
         try {
             nuevoPrecioUni = Float.parseFloat(PrecioUni.getText());
-            prodToUpdate.setPrecioUnitario(nuevoPrecioUni);
+            prodToUpdate.setUnitaryPrice(nuevoPrecioUni);
             
         } catch (Exception ex) {  
            
             JOptionPane.showMessageDialog(modalUpdateFrame, "Por favor, ingrese un precio válido.");
             PrecioUni.setBorder(new LineBorder(Color.RED, 2));
-            PrecioUni.setText(prodToUpdate.getPrecioUnitario() + "");
+            PrecioUni.setText(prodToUpdate.getUnitaryPrice() + "");
             return;
             
         }
@@ -2036,11 +2043,11 @@ public class Sistema extends javax.swing.JFrame {
         try {
          
             nuevaCantIni = Integer.parseInt(CantInici.getText());
-            prodToUpdate.setCantidadInicial(nuevaCantIni);
+            prodToUpdate.setInitialQuantity(nuevaCantIni);
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(modalUpdateFrame, "Por favor, ingrese una cantidad inicial valida.");
             CantInici.setBorder(new LineBorder(Color.RED, 2));
-            CantInici.setText(prodToUpdate.getCantidadInicial() + "");
+            CantInici.setText(prodToUpdate.getInitialQuantity() + "");
             return;
         }
 
@@ -2050,21 +2057,21 @@ public class Sistema extends javax.swing.JFrame {
         if (nuevoTitulo.isEmpty()) {
             JOptionPane.showMessageDialog(modalUpdateFrame, "Por favor ingresa un Título válido.");
             Titulo.setBorder(new LineBorder(Color.RED, 2));
-            Titulo.setText(prodToUpdate.getTitulo());
+            Titulo.setText(prodToUpdate.getTitle());
             return; // Salir del método o tomar otras acciones según sea necesario
         }
         
-        prodToUpdate.setTitulo(nuevoTitulo);
+        prodToUpdate.setTitle(nuevoTitulo);
 
         String nuevaDesc = Desc.getText();
         
         String nuevoProveedor = jComboProv.getSelectedItem().toString();
         String nuevaCategoria = jComboCat.getSelectedItem().toString();
 
-        prodToUpdate.setDescripcion(nuevaDesc);
-        prodToUpdate.setProveedor(nuevoProveedor);
-        prodToUpdate.setCategoria(nuevaCategoria);
-        prodToUpdate.setHabilitado(btnUpdateEnabled.isSelected());
+        prodToUpdate.setDescription(nuevaDesc);
+        prodToUpdate.setProvider(nuevoProveedor);
+        prodToUpdate.setCategory(nuevaCategoria);
+        prodToUpdate.setEnabled(btnUpdateEnabled.isSelected());
         
         try {
             this.productosService.update(prodToUpdate);
@@ -2151,7 +2158,7 @@ public class Sistema extends javax.swing.JFrame {
         // TODO add your handling code here:
         LimpiarTable((DefaultTableModel) TableVenta.getModel());
         ClearVentaInputs();
-        this.tmpVenta = new Venta();
+        this.tmpVenta = new Sale();
     }//GEN-LAST:event_btnClearVentaActionPerformed
 
     private void btnMostrarDetalleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMostrarDetalleActionPerformed
@@ -2170,9 +2177,9 @@ public class Sistema extends javax.swing.JFrame {
             // Obtener los valores de la fila seleccionada
             String VentaID = TableVentasHistorico.getValueAt(filaSeleccionada, 0).toString();
             
-            int castID = Integer.parseInt(VentaID);
+            Long castID = Long.parseLong(VentaID);
             
-            Venta ventaEncontrada = null;
+            Sale ventaEncontrada = null;
             
             try {
                 ventaEncontrada = ventasService.fetch(castID);
@@ -2185,7 +2192,7 @@ public class Sistema extends javax.swing.JFrame {
                 jId.setText(ventaEncontrada.getId() + "");
                 jTotal.setText(ventaEncontrada.getTotal() + "");
                 
-                LoadVentaDetalle(ventaEncontrada.getDetalle());
+                LoadVentaDetalle(ventaEncontrada.getDetail());
                 
             } catch(Exception ex) {
                 

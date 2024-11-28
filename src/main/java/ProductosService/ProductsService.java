@@ -36,6 +36,7 @@ public class ProductsService {
         for (int i = 0;i < products.length; i++){
             this.store.add(products[i]);
         }
+        
     }
     
     private void validateProducto(Product product) throws ValidationException {
@@ -54,7 +55,7 @@ public class ProductsService {
     
         try {
 
-            List<Product> found = this.store.search("codigo", String.format("'%s'", codigo));
+            List<Product> found = this.store.search("code", String.format("'%s'", codigo));
             
             if (found.size() == 0) throw new Exception();
             

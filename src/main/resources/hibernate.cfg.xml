@@ -25,8 +25,9 @@
 		<!-- Dialect is required to let Hibernate know the Database Type, MySQL, Oracle etc
 			Hibernate 4 automatically figure out Dialect from Database Connection Metadata -->
                 <property name="hibernate.dialect">org.hibernate.dialect.H2Dialect</property>
-
 		<!-- mapping file, we can use Bean annotations too --> 
-		<mapping class="ProductosService.Producto"/>
+		<mapping class="ProductosService.Product"/>
+                <mapping class="VentasService.Sale"/>
+                <mapping class="VentasService.Detail"/>
 	</session-factory>
 </hibernate-configuration>

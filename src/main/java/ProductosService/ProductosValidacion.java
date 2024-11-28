@@ -31,9 +31,17 @@ public class ProductosValidacion {
     //Nos permite solo numeros
     public static void numberKeyPress(KeyEvent evt){
 	//declaramos una variable y le asignamos un evento
-	char car=evt.getKeyChar();
-	if((car < '1' || car >'9') && (car != (char) KeyEvent.VK_BACK_SPACE)) {
-		evt.consume();
+	char car = evt.getKeyChar();
+        
+        JTextField textField = (JTextField) evt.getComponent();
+        
+        if (textField.getText().equals("0")) {
+            textField.setText("");
+            evt.consume();
+        }
+        
+	if((car < '0' || car >'9') && (car != (char) KeyEvent.VK_BACK_SPACE)) {
+            evt.consume();
 	}
     }
     //Nos permite solo decimales
