@@ -33,6 +33,7 @@
 		<!-- mapping file, we can use Bean annotations too --> 
 		<mapping class="ProductosService.Product"/>
                 <mapping class="ProductosService.Category"/>
+                <mapping class="ProductosService.Provider"/>
                 <mapping class="VentasService.Sale"/>
                 <mapping class="VentasService.Detail"/>
 	</session-factory>
