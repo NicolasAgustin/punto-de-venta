@@ -10,6 +10,7 @@ import Modelo.Cliente;
 import Modelo.ClienteDAO;
 import Modelo.MockClienteDAO;
 import Persistence.HibernateUtil;
+import ProductosService.Category;
 
 
 import java.util.List;
@@ -1272,7 +1273,6 @@ public class Sistema extends javax.swing.JFrame {
         jLabel35.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel35.setText("Codigo*:");
 
-        cbxCatego.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Limpieza", "Alimento", "Lacteos", "Textil" }));
         cbxCatego.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cbxCategoActionPerformed(evt);
@@ -1441,6 +1441,11 @@ public class Sistema extends javax.swing.JFrame {
         principalPanel.setSelectedIndex(3);
         jtxtFiltro.setText("");
         LimpiarTable((DefaultTableModel) TableProducto.getModel());
+        
+        for (Category cat: productosService.getProductsCategories()) {
+            cbxCatego.addItem(cat.getDescription());
+        }
+        
         LoadProductos();
     }//GEN-LAST:event_menuProductosBtnActionPerformed
 
