@@ -906,6 +906,7 @@ public class Sistema extends javax.swing.JFrame {
         LabelTotal.setText("----");
 
         btnSaveSale.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/GuardarTodo.png"))); // NOI18N
+        btnSaveSale.setEnabled(false);
         btnSaveSale.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnSaveSaleActionPerformed(evt);
@@ -1429,6 +1430,8 @@ public class Sistema extends javax.swing.JFrame {
 
         principalPanel.setSelectedIndex(0);
         this.tmpVenta = new Sale();
+        LimpiarTable((DefaultTableModel) TableVenta.getModel());
+        LabelTotal.setText("----");
     }//GEN-LAST:event_menuVentasBtnActionPerformed
 
     private void btnLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarActionPerformed

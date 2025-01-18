@@ -72,7 +72,7 @@ public class Detail {
     public Object[] toObject() {
         return new Object[]{
             this.product.getCode(),
-            this.product.getDescription(),
+            this.product.getTitle(),
             this.quantity,
             this.product.getUnitaryPrice(),
             this.discount,
