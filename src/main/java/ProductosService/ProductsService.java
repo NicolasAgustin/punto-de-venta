@@ -21,10 +21,14 @@ import java.util.ArrayList;
 public class ProductsService {
     
     private final Store<Product> store;
+    private final Store<Category> categories_store;
+    private final Store<Provider> providers_store;
     
     public ProductsService() {
-        this.store = new Store<Product>(Product.class);
-        
+        this.store = new Store(Product.class);
+        this.categories_store = new Store(Category.class);
+        this.providers_store = new Store(Provider.class);
+//        
         Product[] products = new Product[] {
             new Product(0, 1600, 10, "Jugo de arandanos", "", "0", "proveedor 1", "Alimento", true),
             new Product(0, 700, 20, "Leche largavida", "", "1", "proveedor 1", "Alimento", true),
@@ -33,10 +37,40 @@ public class ProductsService {
             new Product(0, 1500, 10, "Monster energy", "", "4", "proveedor 1", "Alimento", true),
         };
         
-        for (int i = 0;i < products.length; i++){
-            this.store.add(products[i]);
+        for (Product product : products) {
+            this.store.add(product);
         }
         
+        String[] categories = new String[] {
+            "Almacen",
+            "Bebidas",
+            "Frescos",
+            "Congelados",
+            "Limpieza",
+            "Perfumeria",
+            "Electro",
+            "Textil",
+            "Hogar"
+        };
+        
+        for (String cat: categories) {
+            this.categories_store.add(new Category(cat));
+        }
+        
+        ProvidersIngest();
+        
+    }
+    
+    private void ProvidersIngest() {
+        this.providers_store.add(new Provider("Alimentos SA", "30202020204", this.store.list()));
+    }
+    
+    public List<Category> getProductsCategories() {
+        return this.categories_store.list();
+    }
+    
+    public List<Provider> getProviders() {
+        return this.providers_store.list();
     }
     
     private void validateProducto(Product product) throws ValidationException {
@@ -48,7 +82,6 @@ public class ProductsService {
         
         if ("".equals(product.getTitle()))
             throw new ValidationException("El titulo del producto no puede ser nulo.");
-        
     }
     
     public Product searchByCodigo(String codigo) throws StoreException {

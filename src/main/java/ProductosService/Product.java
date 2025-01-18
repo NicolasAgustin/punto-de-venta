@@ -10,7 +10,11 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
+import java.util.List;
 
 
 /**
@@ -50,6 +54,14 @@ public class Product implements BaseTableModel {
     
     @Column(name="enabled")
     private boolean enabled;
+
+    @ManyToMany
+    @JoinTable(
+        name = "products_providers",
+        joinColumns = @JoinColumn(name = "product_id"),
+        inverseJoinColumns = @JoinColumn(name = "provider_id")
+    )
+    private List<Provider> providers;
     
     public Product() {}
     
