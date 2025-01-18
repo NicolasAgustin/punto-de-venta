@@ -13,6 +13,7 @@ import VentasService.PaymentProcessor.PaymentProcessor;
  *
  * @author Nico
  */
+@Deprecated
 public class PaymentInformation {
     
     private long timestamp;
