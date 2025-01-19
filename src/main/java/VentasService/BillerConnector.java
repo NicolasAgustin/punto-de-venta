@@ -10,13 +10,17 @@ package VentasService;
  */
 public class BillerConnector {
     
+    public int invoice_number = 0;
+    
     public BillerConnector() {}
     
-    public void createInvoice() {
+    public int createInvoice() {
+        this.invoice_number += 1;
         try {
-            Thread.sleep(5000);
+            Thread.sleep(10);
+            return invoice_number;
         } catch (InterruptedException ex) {
-            return;
+            return invoice_number;
         }
     }
     

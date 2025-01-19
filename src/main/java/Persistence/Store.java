@@ -39,6 +39,10 @@ public class Store<T> {
         this.typeClass = typeClass;
     }
     
+    public Session createSession() {
+        return this.sessionFactory.openSession();
+    }
+    
     public boolean add(T entity) {
         
         try {

@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.UUID;
 import Persistence.Store;
 import java.time.Instant;
+import org.hibernate.Session;
 
 /**
  *
@@ -129,6 +130,20 @@ public class VentasService {
         return sale;
     }
     
+    public List<Detail> getDetailFromSale(Long id) {
+    
+        Session session = this.store.createSession();
+        session.beginTransaction();
+        Sale sale = (Sale)session.find(Sale.class, id);
+
+        List<Detail> detail = sale.getDetail();
+        
+        session.close();
+        
+        return detail;
+        
+    }
+    
     public void add(Sale sale, String method) throws ValidationException, StoreException {
         
         this.validateVenta(sale);
@@ -142,11 +157,13 @@ public class VentasService {
         // Enviar informacion para facturacion etc
 //        sale.setPaymentInformation(paymentInfo);
         
-        billerConnector.createInvoice();
-        
+        int invoice_number = billerConnector.createInvoice();
+        sale.setInvoiceNumber(invoice_number+"");
+        sale.setCurrency("ARS");
         try {
             sale.setTimestamp(Instant.now().toEpochMilli());
             this.store.add(sale);
+          
         } catch(Exception ex) {
             throw new StoreException(ex.getMessage());
         }

@@ -9,6 +9,7 @@ import VentasService.Detail;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -39,8 +40,11 @@ public class Sale implements BaseTableModel {
     @Column(name="total")
     private float total = 0;
     
-    @OneToMany(cascade=CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "sale_id") // Esta columna va a estar en la tabla sale_details
+    @Column(name="invoice_number")
+    private String invoice_number;
+    
+    @OneToMany(cascade=CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER, mappedBy="sale")
+//    @JoinColumn(name = "sale_id") // Esta columna va a estar en la tabla sale_details
     private List<Detail> detail;
     
     @Column(name="timestamp")
@@ -53,6 +57,7 @@ public class Sale implements BaseTableModel {
         id = new Long(0);
         total = 0;
         detail = new ArrayList<>();
+        invoice_number = "";
     }
     
     public Sale(Long id, int total, String compradorDNI, List<Detail> detail) {
@@ -109,6 +114,14 @@ public class Sale implements BaseTableModel {
         return this.currency;
     }
     
+    public String getInvoiceNumber() {
+        return this.invoice_number;
+    }
+    
+    public void setInvoiceNumber(String invoice_number) {
+        this.invoice_number = invoice_number;
+    }
+    
     public void setCurrency(String currency) {
         this.currency = currency;
     }
@@ -150,12 +163,13 @@ public class Sale implements BaseTableModel {
         return new Object[]{
             this.id,
             this.total, //total
+            this.invoice_number,
             df.format(new Date(this.timestamp)),//fecha
             this.currency //moneda
         };
     }
     
     public static final String[] getColumnNames() {
-        return new String[]{ "ID", "TOTAL", "FECHA", "MONEDA" };
+        return new String[]{ "ID", "TOTAL", "NUMERO DE FACTURA", "FECHA", "MONEDA" };
     }
 }
