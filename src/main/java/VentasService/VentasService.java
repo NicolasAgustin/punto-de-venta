@@ -157,6 +157,10 @@ public class VentasService {
         // Enviar informacion para facturacion etc
 //        sale.setPaymentInformation(paymentInfo);
         
+        for (Detail saleDetail: sale.getDetail()) {
+            saleDetail.setSale(sale);
+        }
+
         int invoice_number = billerConnector.createInvoice();
         sale.setInvoiceNumber(invoice_number+"");
         sale.setCurrency("ARS");

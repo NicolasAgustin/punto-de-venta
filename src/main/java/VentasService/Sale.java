@@ -44,7 +44,6 @@ public class Sale implements BaseTableModel {
     private String invoice_number;
     
     @OneToMany(cascade=CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER, mappedBy="sale")
-//    @JoinColumn(name = "sale_id") // Esta columna va a estar en la tabla sale_details
     private List<Detail> detail;
     
     @Column(name="timestamp")

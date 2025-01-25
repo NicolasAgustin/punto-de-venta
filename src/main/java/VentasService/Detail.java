@@ -35,7 +35,7 @@ public class Detail {
     private Product product;
     
     @ManyToOne
-    @JoinColumn(name="sale_id")
+    @JoinColumn(name="sale_id", referencedColumnName="id")
     private Sale sale;
     
     @Column(name = "quantity")
@@ -62,6 +62,15 @@ public class Detail {
         this.total = total;
     }
     
+    public Detail() {
+        this.product = null;
+        this.quantity = 0;
+        this.discount = 0;
+        this.subtotal = 0;
+        this.iva = 0;
+        this.total = 0;
+    }
+    
     @Override
     public boolean equals(Object obj) {
     
@@ -73,6 +82,14 @@ public class Detail {
     
     public static final String[] getColumnNames() {
         return new String[]{ "Codigo", "Producto", "Cantidad", "Precio unitario", "Descuento", "Subtotal", "Iva", "Total"};
+    }
+    
+    public Sale getSale() {
+        return this.sale;
+    }
+    
+    public void setSale(Sale sale) {
+        this.sale = sale;
     }
     
     public Object[] toObject() {
