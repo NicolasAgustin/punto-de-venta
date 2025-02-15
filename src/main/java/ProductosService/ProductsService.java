@@ -62,7 +62,7 @@ public class ProductsService {
     }
     
     private void ProvidersIngest() {
-        this.providers_store.add(new Provider("Alimentos SA", "30202020204", this.store.list()));
+        this.providers_store.add(new Provider("Alimentos SA", "", "30202020204", this.store.list()));
     }
     
     public List<Category> getProductsCategories() {

@@ -138,6 +138,20 @@ public class Sistema extends javax.swing.JFrame {
             }
         });
 
+        TableProvider.setModel(new DefaultTableModel() {
+            String[] columns = Provider.getColumnNames();
+
+            @Override
+            public int getColumnCount() {
+                return columns.length;
+            }
+
+            @Override
+            public String getColumnName(int index) {
+                return columns[index];
+            }
+        });
+        
         // Custom model for Ventas table
         TableVenta.setModel(new DefaultTableModel() {
             String[] columns = Detail.getColumnNames();
@@ -250,6 +264,15 @@ public class Sistema extends javax.swing.JFrame {
         // Crear un TableRowSorter y aplicarlo a la tabla
         trs = new TableRowSorter(modelo);
         TableProducto.setRowSorter(trs);
+    }
+    
+    public void LoadProviders() {
+        List<Object[]> objToAdd = new ArrayList();
+        
+        this.productosService.getProviders().forEach(prov -> objToAdd.add(prov.toArray()));
+        modelo = (DefaultTableModel) TableProvider.getModel();
+        objToAdd.forEach(obj -> modelo.addRow(obj));
+        TableProvider.setModel(modelo);
     }
 
     public void LoadVentas() {
@@ -384,6 +407,7 @@ public class Sistema extends javax.swing.JFrame {
         menuVentasBtn = new javax.swing.JButton();
         menuProductosBtn = new javax.swing.JButton();
         ventasButton = new javax.swing.JButton();
+        menuProveedoresBtn = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         principalPanel = new javax.swing.JTabbedPane();
         nuevaVentaPanel = new javax.swing.JPanel();
@@ -428,6 +452,9 @@ public class Sistema extends javax.swing.JFrame {
         btnEliminarpro = new javax.swing.JButton();
         btnEditarpro = new javax.swing.JButton();
         productsErrorDisplay = new javax.swing.JLabel();
+        proveedoresPanel = new javax.swing.JPanel();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        TableProvider = new javax.swing.JTable();
 
         jFrame1.getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
@@ -906,16 +933,22 @@ public class Sistema extends javax.swing.JFrame {
             }
         });
 
+        menuProveedoresBtn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/proveedor.png"))); // NOI18N
+        menuProveedoresBtn.setText("Proveedores");
+        menuProveedoresBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuProveedoresBtnActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(menuVentasBtn, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(menuProductosBtn, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(ventasButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(0, 0, 0))
+            .addComponent(menuVentasBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(menuProductosBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(ventasButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(menuProveedoresBtn, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -926,7 +959,9 @@ public class Sistema extends javax.swing.JFrame {
                 .addComponent(ventasButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(menuProductosBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(377, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(menuProveedoresBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(333, Short.MAX_VALUE))
         );
 
         getContentPane().add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 150, 720));
@@ -1403,6 +1438,38 @@ public class Sistema extends javax.swing.JFrame {
         );
 
         principalPanel.addTab("Productos", jPanel5);
+
+        TableProvider.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane5.setViewportView(TableProvider);
+
+        javax.swing.GroupLayout proveedoresPanelLayout = new javax.swing.GroupLayout(proveedoresPanel);
+        proveedoresPanel.setLayout(proveedoresPanelLayout);
+        proveedoresPanelLayout.setHorizontalGroup(
+            proveedoresPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(proveedoresPanelLayout.createSequentialGroup()
+                .addGap(31, 31, 31)
+                .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 944, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(35, Short.MAX_VALUE))
+        );
+        proveedoresPanelLayout.setVerticalGroup(
+            proveedoresPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(proveedoresPanelLayout.createSequentialGroup()
+                .addGap(28, 28, 28)
+                .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 441, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        principalPanel.addTab("Proveedores", proveedoresPanel);
 
         getContentPane().add(principalPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 140, 1010, 510));
 
@@ -2299,6 +2366,15 @@ public class Sistema extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtPrecioUniActionPerformed
 
+    private void menuProveedoresBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuProveedoresBtnActionPerformed
+        // TODO add your handling code here:
+        // TODO add your handling code here:
+        principalPanel.setSelectedIndex(3);
+        LimpiarTable((DefaultTableModel) TableProvider.getModel());
+        
+        LoadProviders();
+    }//GEN-LAST:event_menuProveedoresBtnActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -2344,6 +2420,7 @@ public class Sistema extends javax.swing.JFrame {
     private javax.swing.JPanel PaymentMethodPanel;
     public javax.swing.JTextField PrecioUni;
     private javax.swing.JTable TableProducto;
+    private javax.swing.JTable TableProvider;
     private javax.swing.JTable TableVenta;
     private javax.swing.JTable TableVentaDetalle;
     private javax.swing.JTable TableVentasHistorico;
@@ -2406,11 +2483,13 @@ public class Sistema extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTextField jtxtFiltro;
     private javax.swing.JLabel labelUpdateID;
     private java.awt.List list1;
     private javax.swing.JButton menuProductosBtn;
+    private javax.swing.JButton menuProveedoresBtn;
     private javax.swing.JButton menuVentasBtn;
     private javax.swing.JPanel modalDetalle;
     private javax.swing.JPanel modalProgressBar;
@@ -2422,6 +2501,7 @@ public class Sistema extends javax.swing.JFrame {
     private javax.swing.JTextField paymentCashVuelto;
     private javax.swing.JTabbedPane principalPanel;
     private javax.swing.JLabel productsErrorDisplay;
+    private javax.swing.JPanel proveedoresPanel;
     private javax.swing.JTextField txtCantIni;
     private javax.swing.JTextField txtCantidadVenta;
     private javax.swing.JTextField txtCod;

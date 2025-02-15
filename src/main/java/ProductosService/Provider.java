@@ -1,6 +1,7 @@
 
 package ProductosService;
 
+import Modelo.BaseTableModel;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -17,7 +18,7 @@ import java.util.List;
  */
 @Entity
 @Table(name = "providers")
-public class Provider
+public class Provider implements BaseTableModel
 {
     
     @Id
@@ -28,6 +29,9 @@ public class Provider
     @ManyToMany(mappedBy = "providers")
     private List<Product> products;
     
+    @Column(name="name")
+    private String name;
+    
     @Column(name="description")
     private String description;
     
@@ -36,7 +40,8 @@ public class Provider
     
     public Provider() {}
     
-    public Provider(String description, String taxPayerId, List<Product> products) {
+    public Provider(String name, String description, String taxPayerId, List<Product> products) {
+        this.name = name;
         this.description = description;
         this.taxPayerId = taxPayerId;
         this.products = products;
@@ -56,6 +61,27 @@ public class Provider
 
     public void setTaxPayerId(String taxPayerId) {
         this.taxPayerId = taxPayerId;
+    }
+    
+    @Override
+    public String toString() {
+        return this.name;
+    }
+    
+    @Override
+    public Object[] toArray() {
+        Object[] values = new Object[]{
+            this.id,
+            this.name,
+            this.description,
+            this.taxPayerId
+                //agregar los campos nuevos
+        };    
+        return values;
+    }
+    
+    public static String[] getColumnNames() {
+        return new String[]{ "ID", "RAZON SOCIAL", "DESCRIPCION", "CUIT/CUIL" };
     }
     
 }
