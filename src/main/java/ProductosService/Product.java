@@ -115,6 +115,14 @@ public class Product implements BaseTableModel {
         this.enabled = enabled;
     }
 
+    public List<Provider> getProviders() {
+        return this.providers;
+    }
+    
+    public void setProviders(List<Provider> providers) {
+        this.providers = providers;
+    }
+    
     public String getProvider() {
         return provider;
     }
