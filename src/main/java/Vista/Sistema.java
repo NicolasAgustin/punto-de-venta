@@ -1904,7 +1904,7 @@ public class Sistema extends javax.swing.JFrame {
         String nuevaCategoria = jComboCat.getSelectedItem().toString();
 
         prodToUpdate.setDescription(nuevaDesc);
-        prodToUpdate.setProvider(nuevoProveedor);
+//        prodToUpdate.setProvider(nuevoProveedor);
         prodToUpdate.setCategory(nuevaCategoria);
         prodToUpdate.setEnabled(btnUpdateEnabled.isSelected());
         
@@ -2306,7 +2306,6 @@ public class Sistema extends javax.swing.JFrame {
                     form.validatedForm.title,
                     form.validatedForm.description,
                     form.validatedForm.code,
-                    form.validatedForm.proveedor,
                     form.validatedForm.categoria,
                     castEstado
                 );

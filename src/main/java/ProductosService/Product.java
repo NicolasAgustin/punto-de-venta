@@ -45,10 +45,6 @@ public class Product implements BaseTableModel {
     @Column(name="code", length=50)
     private String code;
     
-    @Column(name="provider", length=50)
-    private String provider;
-    // TODO: Convertir en enum (ni idea)
-    
     @Column(name="category", length=50)
     private String category;
     
@@ -79,7 +75,6 @@ public class Product implements BaseTableModel {
             this.title,
             this.description,
             this.code,
-            this.provider,
             this.category,
             this.enabled,
                 //agregar los campos nuevos
@@ -88,17 +83,16 @@ public class Product implements BaseTableModel {
     }
     
     public static String[] getColumnNames() {
-        return new String[]{ "ID", "PRECIO UNITARIO", "CANTIDAD INICIAL", "TITULO", "DESCRIPCION", "CODIGO", "PROVEEDOR", "CATEGORIA", "ESTADO"};
+        return new String[]{ "ID", "PRECIO UNITARIO", "CANTIDAD INICIAL", "TITULO", "DESCRIPCION", "CODIGO", "CATEGORIA", "ESTADO"};
     }
     
     public Product(
         int id,
-        float unitaryPrice,
+        Float unitaryPrice,
         int initialQuantity,
         String title,
         String descripcion,
         String code,
-        String provider,
         String category,
         boolean enabled
     ) {
@@ -110,7 +104,6 @@ public class Product implements BaseTableModel {
         this.description = description;
         //Esto es para el codigo de barra Ej 12312312312312312312423346544324124123
         this.code = code;
-        this.provider = provider;
         this.category = category;
         this.enabled = enabled;
     }
@@ -121,15 +114,6 @@ public class Product implements BaseTableModel {
     
     public void setProviders(List<Provider> providers) {
         this.providers = providers;
-    }
-    
-    public String getProvider() {
-        return provider;
-    }
-
-    public void setProvider(String provider) {
-        this.provider = provider;
-
     }
     
     public int getId() {

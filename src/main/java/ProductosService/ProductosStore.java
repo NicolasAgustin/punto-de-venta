@@ -128,7 +128,6 @@ public class ProductosStore implements CrudOperations<Product> {
             prod.setDescription(cl.getDescription());
             prod.setEnabled(cl.getEnabled());
             prod.setUnitaryPrice(cl.getUnitaryPrice());
-            prod.setProvider(cl.getProvider());
             prod.setTitle(cl.getTitle());
             
             em.merge(prod);

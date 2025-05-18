@@ -30,11 +30,11 @@ public class ProductsService {
         this.providers_store = new Store(Provider.class);
 //        
         Product[] products = new Product[] {
-            new Product(0, 1600, 10, "Jugo de arandanos", "", "0", "proveedor 1", "Alimento", true),
-            new Product(0, 700, 20, "Leche largavida", "", "1", "proveedor 1", "Alimento", true),
-            new Product(0, 2500, 10, "Jugo de naranjas", "", "2", "proveedor 1", "Alimento", true),
-            new Product(0, 2500, 10, "Gaseosa pepsi 2.25lt", "", "3", "proveedor 1", "Alimento", true),
-            new Product(0, 1500, 10, "Monster energy", "", "4", "proveedor 1", "Alimento", true),
+            new Product(0, (float) 1600, 10, "Jugo de arandanos", "", "0", "Alimento", true),
+            new Product(0, (float) 700, 20, "Leche largavida", "", "1", "Alimento", true),
+            new Product(0, (float) 2500, 10, "Jugo de naranjas", "", "2", "Alimento", true),
+            new Product(0, (float) 2500, 10, "Gaseosa pepsi 2.25lt", "", "3", "Alimento", true),
+            new Product(0, (float) 1500, 10, "Monster energy", "", "4", "Alimento", true),
         };
         
         for (Product product : products) {
@@ -58,6 +58,9 @@ public class ProductsService {
         }
         
         ProvidersIngest();
+        
+        // TODO: Hacer carga de PrecioProveedorProducto
+        // ver como relacionar un proveedor con un producto al momento de la carga
         
     }
     
