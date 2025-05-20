@@ -34,6 +34,7 @@
 		<mapping class="ProductosService.Product"/>
                 <mapping class="ProductosService.Category"/>
                 <mapping class="ProductosService.Provider"/>
+                <mapping class="ProductosService.PrecioProveedorProducto"/>
                 <mapping class="VentasService.Sale"/>
                 <mapping class="VentasService.Detail"/>
 	</session-factory>

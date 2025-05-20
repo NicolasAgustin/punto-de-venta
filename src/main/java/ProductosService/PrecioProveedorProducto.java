@@ -1,5 +1,5 @@
-import ProductosService.Product;
-import ProductosService.Provider;
+package ProductosService;
+
 import jakarta.persistence.*;
 import java.io.Serializable;
 import java.util.Objects;
@@ -12,35 +12,35 @@ public class PrecioProveedorProducto {
     @Embeddable
     public static class PrecioProveedorProductoId implements Serializable {
         @Column(name = "producto_id")
-        private Long productoId;
+        private Long producto;
 
         @Column(name = "proveedor_id")
-        private Long proveedorId;
+        private Long proveedor;
 
         // Constructor, equals y hashCode
 
         public PrecioProveedorProductoId() {
         }
 
-        public PrecioProveedorProductoId(Long productoId, Long proveedorId) {
-            this.productoId = productoId;
-            this.proveedorId = proveedorId;
+        public PrecioProveedorProductoId(Long producto, Long proveedor) {
+            this.producto = producto;
+            this.proveedor = proveedor;
         }
 
-        public Long getProductoId() {
-            return productoId;
+        public Long getProducto() {
+            return producto;
         }
 
-        public void setProductoId(Long productoId) {
-            this.productoId = productoId;
+        public void setProducto(Long producto) {
+            this.producto = producto;
         }
 
-        public Long getProveedorId() {
-            return proveedorId;
+        public Long getProveedor() {
+            return proveedor;
         }
 
-        public void setProveedorId(Long proveedorId) {
-            this.proveedorId = proveedorId;
+        public void setProveedor(Long proveedor) {
+            this.proveedor = proveedor;
         }
 
         @Override
@@ -48,12 +48,12 @@ public class PrecioProveedorProducto {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             PrecioProveedorProductoId that = (PrecioProveedorProductoId) o;
-            return Objects.equals(productoId, that.productoId) && Objects.equals(proveedorId, that.proveedorId);
+            return Objects.equals(producto, that.producto) && Objects.equals(proveedor, that.proveedor);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(productoId, proveedorId);
+            return Objects.hash(producto, proveedor);
         }
     }
 
@@ -67,7 +67,7 @@ public class PrecioProveedorProducto {
     @JoinColumn(name = "proveedor_id")
     private Provider proveedor;
 
-    private Double precio;
+    private double precio;
 
     // Getters y setters
 
@@ -87,11 +87,11 @@ public class PrecioProveedorProducto {
         this.proveedor = proveedor;
     }
 
-    public Double getPrecio() {
+    public double getPrecio() {
         return precio;
     }
 
-    public void setPrecio(Double precio) {
+    public void setPrecio(double precio) {
         this.precio = precio;
     }
 }

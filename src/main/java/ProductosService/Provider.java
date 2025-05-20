@@ -9,8 +9,11 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -26,8 +29,11 @@ public class Provider implements BaseTableModel
     @Column(name="id")
     private Long id;
     
-    @ManyToMany(mappedBy = "providers")
-    private List<Product> products;
+    @OneToMany(mappedBy = "proveedor", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<PrecioProveedorProducto> preciosPorProducto = new HashSet<>();
+    
+//    @ManyToMany(mappedBy = "providers")
+//    private List<Product> products;
     
     @Column(name="name")
     private String name;
@@ -44,9 +50,26 @@ public class Provider implements BaseTableModel
         this.name = name;
         this.description = description;
         this.taxPayerId = taxPayerId;
-        this.products = products;
     }
  
+    public void setPreciosPorProducto(Set<PrecioProveedorProducto> preciosPorProducto) {
+        this.preciosPorProducto = preciosPorProducto;
+    }
+    
+    public Set<PrecioProveedorProducto> getPreciosPorProducto() {
+        return preciosPorProducto;
+    }
+    
+    public void agregarPrecioProducto(PrecioProveedorProducto precioProveedorProducto) {
+        this.preciosPorProducto.add(precioProveedorProducto);
+        precioProveedorProducto.setProveedor(this);
+    }
+
+    public void removerPrecioProducto(PrecioProveedorProducto precioProveedorProducto) {
+        this.preciosPorProducto.remove(precioProveedorProducto);
+        precioProveedorProducto.setProveedor(null);
+    }
+    
     public String getDescription() {
         return description;
     }

@@ -5,16 +5,21 @@
 package ProductosService;
 
 import Modelo.BaseTableModel;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -32,6 +37,10 @@ public class Product implements BaseTableModel {
     
     @Column(name="unitary_price")
     private float unitaryPrice;
+    
+    // This field holds the price that customer will pay for the product
+    @Column(name="public_sale_price", nullable = false)
+    private double publicSalePrice;
     
     @Column(name="initial_quantity")
     private int initialQuantity;
@@ -51,13 +60,18 @@ public class Product implements BaseTableModel {
     @Column(name="enabled")
     private boolean enabled;
 
-    @ManyToMany
-    @JoinTable(
-        name = "products_providers",
-        joinColumns = @JoinColumn(name = "product_id"),
-        inverseJoinColumns = @JoinColumn(name = "provider_id")
-    )
-    private List<Provider> providers;
+//    @ManyToMany
+//    @JoinTable(
+//        name = "products_providers",
+//        joinColumns = @JoinColumn(name = "product_id"),
+//        inverseJoinColumns = @JoinColumn(name = "provider_id")
+//    )
+//    private List<Provider> providers;
+    
+    // TODO: Testear esto
+    // - Agregar a pantallas de ABM
+    @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private Set<PrecioProveedorProducto> preciosPorProveedor = new HashSet<>();
     
     public Product() {}
     
@@ -108,12 +122,22 @@ public class Product implements BaseTableModel {
         this.enabled = enabled;
     }
 
-    public List<Provider> getProviders() {
-        return this.providers;
+    public Set<PrecioProveedorProducto> getPreciosPorProveedor() {
+        return this.preciosPorProveedor;
     }
     
-    public void setProviders(List<Provider> providers) {
-        this.providers = providers;
+    public void setPreciosPorProveedor(Set<PrecioProveedorProducto> proveedoresPrecios) {
+        this.preciosPorProveedor = preciosPorProveedor;
+    }
+    
+    public void agregarPrecioProveedor(PrecioProveedorProducto precioProveedorProducto) {
+        this.preciosPorProveedor.add(precioProveedorProducto);
+        precioProveedorProducto.setProducto(this);
+    }
+
+    public void removerPrecioProveedor(PrecioProveedorProducto precioProveedorProducto) {
+        this.preciosPorProveedor.remove(precioProveedorProducto);
+        precioProveedorProducto.setProducto(null);
     }
     
     public int getId() {
@@ -142,6 +166,14 @@ public class Product implements BaseTableModel {
     
     public int getInitialQuantity() {
         return initialQuantity;
+    }
+    
+    public void setPublicSalePrice(double price) {
+        this.publicSalePrice = price;
+    }
+    
+    public double getPublicSalePrice() {
+        return this.publicSalePrice;
     }
 
     public void setInitialQuantity(int initialQuantity) {
@@ -179,5 +211,5 @@ public class Product implements BaseTableModel {
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
-   
+    
 }

@@ -11,6 +11,8 @@ import java.util.List;
 
 import Persistence.Store;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Random;
 
 
 /**
@@ -59,13 +61,43 @@ public class ProductsService {
         
         ProvidersIngest();
         
+        
+        
         // TODO: Hacer carga de PrecioProveedorProducto
         // ver como relacionar un proveedor con un producto al momento de la carga
         
     }
     
     private void ProvidersIngest() {
-        this.providers_store.add(new Provider("Alimentos SA", "", "30202020204", this.store.list()));
+        
+        Random random = new Random();
+        
+        List<Product> products = this.store.list();
+        
+        for (Product product: products) {
+            for (Provider provider: Arrays.asList(
+                new Provider("Alimentos SA", "", "30202020204", products),
+                new Provider("La Virginia", "", "30661945369", products)
+            )){
+
+                PrecioProveedorProducto ppp = new PrecioProveedorProducto();
+                ppp.setProveedor(provider);
+                double randomPrice = random.nextDouble() * (5000 + Double.MIN_VALUE);
+                ppp.setPrecio(randomPrice);
+                
+                // Price + 10%
+                product.setPublicSalePrice(randomPrice * 0.10);
+                ppp.setProducto(product);
+                product.agregarPrecioProveedor(ppp);
+                this.store.update(product);
+                
+                provider.agregarPrecioProducto(ppp);
+                this.providers_store.add(provider);
+                
+            }
+        }
+        // this.providers_store.add(new Provider("Alimentos SA", "", "30202020204", this.store.list()));
+        // this.providers_store.add(new Provider("La Virginia", "", "30661945369", this.store.list()));
     }
     
     public List<Category> getProductsCategories() {
