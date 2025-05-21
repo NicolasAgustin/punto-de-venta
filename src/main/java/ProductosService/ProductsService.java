@@ -10,9 +10,12 @@ import java.sql.SQLException;
 import java.util.List;
 
 import Persistence.Store;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Random;
+import org.hibernate.Session;
 
 
 /**
@@ -71,33 +74,103 @@ public class ProductsService {
     private void ProvidersIngest() {
         
         Random random = new Random();
-        
-        List<Product> products = this.store.list();
-        
-        for (Product product: products) {
-            for (Provider provider: Arrays.asList(
-                new Provider("Alimentos SA", "", "30202020204", products),
-                new Provider("La Virginia", "", "30661945369", products)
-            )){
+        Session session = null; 
+        try {
+            session = this.store.createSession(); 
+            session.beginTransaction(); 
 
-                PrecioProveedorProducto ppp = new PrecioProveedorProducto();
-                ppp.setProveedor(provider);
-                double randomPrice = random.nextDouble() * (5000 + Double.MIN_VALUE);
-                ppp.setPrecio(randomPrice);
+            // Define los datos de los proveedores
+            List<Map.Entry<String, String>> providerData = Arrays.asList(
+                new AbstractMap.SimpleEntry<>("Alimentos SA", "30202020204"),
+                new AbstractMap.SimpleEntry<>("La Virginia", "30661945369")
+            );
+
+            List<Provider> managedProviders = new ArrayList<>();
+
+            // Paso 1: Asegurarse de que los proveedores estén persistidos y gestionados dentro de ESTA sesión
+            for (Map.Entry<String, String> data : providerData) {
+                String name = data.getKey();
+                String taxPayerId = data.getValue();
                 
-                // Price + 10%
-                product.setPublicSalePrice(randomPrice * 0.10);
-                ppp.setProducto(product);
-                product.agregarPrecioProveedor(ppp);
-                this.store.update(product);
-                
-                provider.agregarPrecioProducto(ppp);
-                this.providers_store.add(provider);
-                
+                List<Provider> existingProviders = session.createQuery(
+                    "FROM Provider WHERE taxPayerId = :taxPayerId", Provider.class)
+                    .setParameter("taxPayerId", taxPayerId)
+                    .getResultList();
+
+                Provider provider;
+                if (existingProviders.isEmpty()) {
+                    provider = new Provider(name, "", taxPayerId, null);
+                    session.persist(provider); 
+                } else {
+                    provider = existingProviders.get(0);
+                }
+                managedProviders.add(provider); 
+            }
+
+            // Paso 2: Obtener todos los productos gestionados DENTRO DE ESTA SESIÓN
+            List<Product> products = session.createQuery("FROM Product", Product.class).list(); 
+
+            // Paso 3: Iterar sobre productos y proveedores para crear o actualizar PrecioProveedorProducto
+            for (Product product : products) {
+                // Para cada producto, crearemos o actualizaremos sus precios por proveedor.
+                // Es crucial que el 'product' que se va a 'merge' esté al día con sus colecciones.
+                // Podríamos incluso cargar el producto en este bucle si hay riesgo de que esté "viejo".
+                Product currentProduct = (Product) session.merge(product); // Asegura que el producto esté gestionado y sea la última versión
+
+                for (Provider provider : managedProviders) { // 'provider' aquí está gestionado en ESTA sesión
+
+                    // 1. Crear el ID compuesto
+                    PrecioProveedorProducto.PrecioProveedorProductoId pppId = 
+                        new PrecioProveedorProducto.PrecioProveedorProductoId(currentProduct.getId(), provider.getId());
+
+                    // 2. Intentar encontrar si ya existe un PrecioProveedorProducto con este ID en la sesión/DB
+                    PrecioProveedorProducto ppp = session.find(PrecioProveedorProducto.class, pppId);
+
+                    if (ppp == null) {
+                        // Si no existe, crear una nueva instancia de PrecioProveedorProducto
+                        ppp = new PrecioProveedorProducto();
+                        ppp.setId(pppId); // Establecer el ID compuesto
+                        ppp.setProducto(currentProduct); // Asociar el producto (gestionado)
+                        ppp.setProveedor(provider);     // Asociar el proveedor (gestionado)
+                        
+                        // Añadir a las colecciones del producto y proveedor
+                        // Esto hará que Hibernate detecte la nueva entidad cuando 'merge' a los padres
+                        currentProduct.agregarPrecioProveedor(ppp); 
+                        provider.agregarPrecioProducto(ppp);
+                        
+                        // NOTA: No llamamos a session.persist(ppp) aquí directamente.
+                        // La cascada desde currentProduct (o provider) lo hará cuando se haga merge.
+                    }
+                    
+                    // En este punto, 'ppp' es una instancia gestionada (si existía) o una nueva instancia (si no existía)
+                    // que será gestionada por cascada.
+
+                    double randomPrice = random.nextDouble() * (5000 + Double.MIN_VALUE);
+                    ppp.setPrecio(randomPrice); // Actualizar el precio (siempre)
+
+                    // Actualizar el precio de venta al público del producto
+                    // Esto se hace sobre 'currentProduct' que es el que se está fusionando
+                    currentProduct.setPublicSalePrice(randomPrice * 0.10);
+
+                    // No es necesario llamar a session.merge(ppp) aquí porque la cascada
+                    // desde 'currentProduct' ya lo gestionará.
+                }
+                // Fusionar el producto al final del bucle interno de proveedores.
+                // Esto cascadeará los cambios a todos los PrecioProveedorProducto asociados a 'currentProduct'.
+                session.merge(currentProduct); 
+            }
+            session.getTransaction().commit(); 
+        } catch (Exception ex) {
+            if (session != null && session.getTransaction().isActive()) {
+                session.getTransaction().rollback(); 
+            }
+            System.err.println("Error durante ProvidersIngest: " + ex.getMessage());
+            // Considera lanzar una excepción personalizada o manejar el error adecuadamente
+        } finally {
+            if (session != null && session.isOpen()) {
+                session.close(); 
             }
         }
-        // this.providers_store.add(new Provider("Alimentos SA", "", "30202020204", this.store.list()));
-        // this.providers_store.add(new Provider("La Virginia", "", "30661945369", this.store.list()));
     }
     
     public List<Category> getProductsCategories() {

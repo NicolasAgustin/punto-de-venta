@@ -51,6 +51,8 @@ public class Store<T> {
 
             session.persist(entity);
 
+            session.getTransaction().commit();
+            
             session.close();
             return true;
             

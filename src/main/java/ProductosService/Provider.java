@@ -27,7 +27,7 @@ public class Provider implements BaseTableModel
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     @Column(name="id")
-    private Long id;
+    private int id;
     
     @OneToMany(mappedBy = "proveedor", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<PrecioProveedorProducto> preciosPorProducto = new HashSet<>();
@@ -80,6 +80,10 @@ public class Provider implements BaseTableModel
 
     public String getTaxPayerId() {
         return taxPayerId;
+    }
+    
+    public int getId() {
+        return id;
     }
 
     public void setTaxPayerId(String taxPayerId) {
