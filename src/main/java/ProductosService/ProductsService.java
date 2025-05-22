@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package ProductosService;
 
 import Exceptions.StoreException;
@@ -63,12 +59,6 @@ public class ProductsService {
         }
         
         ProvidersIngest();
-        
-        
-        
-        // TODO: Hacer carga de PrecioProveedorProducto
-        // ver como relacionar un proveedor con un producto al momento de la carga
-        
     }
     
     private void ProvidersIngest() {
@@ -112,13 +102,9 @@ public class ProductsService {
 
             // Paso 3: Iterar sobre productos y proveedores para crear o actualizar PrecioProveedorProducto
             for (Product product : products) {
-                // Para cada producto, crearemos o actualizaremos sus precios por proveedor.
-                // Es crucial que el 'product' que se va a 'merge' esté al día con sus colecciones.
-                // Podríamos incluso cargar el producto en este bucle si hay riesgo de que esté "viejo".
-                Product currentProduct = (Product) session.merge(product); // Asegura que el producto esté gestionado y sea la última versión
+                Product currentProduct = product; // 'product' ya es una entidad gestionada
 
-                for (Provider provider : managedProviders) { // 'provider' aquí está gestionado en ESTA sesión
-
+                for (Provider provider : managedProviders) { 
                     // 1. Crear el ID compuesto
                     PrecioProveedorProducto.PrecioProveedorProductoId pppId = 
                         new PrecioProveedorProducto.PrecioProveedorProductoId(currentProduct.getId(), provider.getId());
@@ -129,34 +115,31 @@ public class ProductsService {
                     if (ppp == null) {
                         // Si no existe, crear una nueva instancia de PrecioProveedorProducto
                         ppp = new PrecioProveedorProducto();
-                        ppp.setId(pppId); // Establecer el ID compuesto
-                        ppp.setProducto(currentProduct); // Asociar el producto (gestionado)
-                        ppp.setProveedor(provider);     // Asociar el proveedor (gestionado)
+                        ppp.setId(pppId); 
+                        ppp.setProducto(currentProduct); 
+                        ppp.setProveedor(provider);     
+                        
+                        // ¡NUEVO!: Persistir explícitamente el nuevo PrecioProveedorProducto
+                        session.persist(ppp); // <-- ¡Línea agregada!
                         
                         // Añadir a las colecciones del producto y proveedor
-                        // Esto hará que Hibernate detecte la nueva entidad cuando 'merge' a los padres
+                        // Esto ahora añade una instancia ya gestionada.
                         currentProduct.agregarPrecioProveedor(ppp); 
                         provider.agregarPrecioProducto(ppp);
-                        
-                        // NOTA: No llamamos a session.persist(ppp) aquí directamente.
-                        // La cascada desde currentProduct (o provider) lo hará cuando se haga merge.
                     }
                     
-                    // En este punto, 'ppp' es una instancia gestionada (si existía) o una nueva instancia (si no existía)
-                    // que será gestionada por cascada.
+                    // En este punto, 'ppp' es una instancia gestionada (ya sea encontrada o recién persistida).
 
                     double randomPrice = random.nextDouble() * (5000 + Double.MIN_VALUE);
                     ppp.setPrecio(randomPrice); // Actualizar el precio (siempre)
 
+                    // TODO: Redondear precio
                     // Actualizar el precio de venta al público del producto
-                    // Esto se hace sobre 'currentProduct' que es el que se está fusionando
                     currentProduct.setPublicSalePrice(randomPrice * 0.10);
-
-                    // No es necesario llamar a session.merge(ppp) aquí porque la cascada
-                    // desde 'currentProduct' ya lo gestionará.
                 }
                 // Fusionar el producto al final del bucle interno de proveedores.
-                // Esto cascadeará los cambios a todos los PrecioProveedorProducto asociados a 'currentProduct'.
+                // Esto cascadeará los cambios (incluyendo las actualizaciones de PrecioProveedorProducto).
+                // Si el PrecioProveedorProducto ya fue persistido explícitamente, 'merge' simplemente lo gestionará.
                 session.merge(currentProduct); 
             }
             session.getTransaction().commit(); 
@@ -165,7 +148,6 @@ public class ProductsService {
                 session.getTransaction().rollback(); 
             }
             System.err.println("Error durante ProvidersIngest: " + ex.getMessage());
-            // Considera lanzar una excepción personalizada o manejar el error adecuadamente
         } finally {
             if (session != null && session.isOpen()) {
                 session.close(); 
@@ -173,12 +155,45 @@ public class ProductsService {
         }
     }
     
+    public List<PrecioProveedorProducto> getProductsByProvider(int providerID) {
+        Session session = null;
+        
+        session = this.store.createSession(); 
+        session.beginTransaction();
+        List<PrecioProveedorProducto> products = session
+                .createQuery("FROM PrecioProveedorProducto ppp WHERE ppp.proveedor.id = :proveedorId", PrecioProveedorProducto.class)
+                .setParameter("proveedorId", providerID)
+                .getResultList();
+                
+        return products;
+    }
+    
     public List<Category> getProductsCategories() {
         return this.categories_store.list();
     }
     
     public List<Provider> getProviders() {
-        return this.providers_store.list();
+        
+        Session session = null;
+        try {
+            session = this.store.createSession(); 
+            session.beginTransaction(); 
+            
+            List<Provider> existingProviders = session.createQuery("FROM Provider", Provider.class).getResultList();
+            
+            session.getTransaction().commit();
+            return existingProviders;
+        } catch (Exception ex) {
+            if (session != null && session.getTransaction().isActive()) {
+                session.getTransaction().rollback();
+            }
+            System.err.println("Error al obtener proveedores: " + ex.getMessage());
+            return new ArrayList<>(); 
+        } finally {
+            if (session != null && session.isOpen()) {
+                session.close();
+            }
+        }
     }
     
     private void validateProducto(Product product) throws ValidationException {
@@ -210,7 +225,6 @@ public class ProductsService {
     
     
     public Product fetch(Long id) throws StoreException {
-        // Esto no deberia ser un fetch por id?
         try {
             Product found = this.store.fetch(id);
             
@@ -257,7 +271,6 @@ public class ProductsService {
     public void delete(Product producto) throws ValidationException, StoreException {
         
         try {
-//            this.store.Eliminar(producto.getId());
               this.store.delete(producto);
         } catch (Exception ex) {
             throw new StoreException(ex.getMessage());

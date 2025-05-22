@@ -13,6 +13,7 @@ import Modelo.ClienteDAO;
 import Modelo.MockClienteDAO;
 import Persistence.HibernateUtil;
 import ProductosService.Category;
+import ProductosService.PrecioProveedorProducto;
 
 
 import java.util.List;
@@ -58,6 +59,8 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.RowFilter;
 import javax.swing.Timer;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import org.hibernate.Session;
@@ -94,8 +97,9 @@ public class Sistema extends javax.swing.JFrame {
     VentasService ventasService = new VentasService();
     ProductsService productosService = new ProductsService();
     JFrame modalFrame = new JFrame();
-     JFrame modalVentaFrame = new JFrame();
+    JFrame modalVentaFrame = new JFrame();
     JFrame modalUpdateFrame = new JFrame();
+    JFrame modalProviderFrame = new JFrame();
     JDialog modalDialog;
     Sale tmpVenta = new Sale();
 
@@ -121,6 +125,26 @@ public class Sistema extends javax.swing.JFrame {
         // Remove the JTabbedPane header
         principalPanel.setUI(new javax.swing.plaf.metal.MetalTabbedPaneUI() {
             protected void paintTabArea(Graphics g, int tabPlacement, int selectedIndex){}
+        });
+        
+        TableProvidersProducts.setModel(new DefaultTableModel() {
+            
+            String[] columns = new String[]{"ID", "PDV", "PCP", "TITULO", "CODIGO"};
+
+            @Override
+            public int getColumnCount() {
+                return columns.length;
+            }
+            
+            @Override
+            public String getColumnName(int index) {
+                return columns[index];
+            }
+            
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Todas las celdas no son editables
+            }
         });
         
         // Custom model for Products table
@@ -149,6 +173,22 @@ public class Sistema extends javax.swing.JFrame {
             @Override
             public String getColumnName(int index) {
                 return columns[index];
+            }
+            
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Todas las celdas no son editables
+            }
+        });
+        
+        TableProvider.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                // Verificar si la selección está finalizada y no hay ajustes en curso
+                if (!e.getValueIsAdjusting()) {
+                    // Llamar a la función que deseas ejecutar
+                    LoadProvidersProducts();
+                }
             }
         });
         
@@ -242,6 +282,72 @@ public class Sistema extends javax.swing.JFrame {
         });
     }
 
+    public void LoadProvidersProducts() {
+        initializeProvidersProductsModal();
+        
+        if (TableProvider.getSelectedRowCount() > 1) {
+            JOptionPane.showMessageDialog(this, "Por favor, seleccione solo una fila para editar.");
+            return;
+        }
+
+        // Obtener fila seleccionada
+        int filaSeleccionada = TableProvider.getSelectedRow();
+
+        // Verificar si hay una fila seleccionada
+        if (filaSeleccionada == -1) {
+            return;
+        }
+
+        // Obtener los valores de la fila seleccionada
+        DefaultTableModel model = (DefaultTableModel) TableProvider.getModel();
+
+        int providerID = Integer.parseInt(TableProvider.getValueAt(filaSeleccionada, model.findColumn("ID")).toString());
+        String razon_social = TableProvider.getValueAt(filaSeleccionada, model.findColumn("RAZON SOCIAL")).toString();
+        String descripcion = TableProvider.getValueAt(filaSeleccionada, model.findColumn("DESCRIPCION")).toString();
+        String tax_payer_id = TableProvider.getValueAt(filaSeleccionada, model.findColumn("CUIT/CUIL")).toString();
+        
+        List<PrecioProveedorProducto> productos = this.productosService.getProductsByProvider(providerID);
+        
+        providerNombre.setText(razon_social);
+        providerTaxPayerID.setText(tax_payer_id);
+        
+//        public void LimpiarTable(DefaultTableModel tableModel) { //para limpiar la tabla para que no se muetsren filas repetidas
+//        for (int i = 0; i < tableModel.getRowCount(); i++) {
+//            tableModel.removeRow(i);
+//            i = i - 1;
+//        }
+//    }
+//        DefaultTableModel dtm = (DefaultTableModel) TableProvidersProducts.getModel();
+//        dtm.setRowCount(0);
+        
+        LimpiarTable((DefaultTableModel) TableProvidersProducts.getModel());
+
+        ////////////////////////////////////////
+        List<Object[]> objToAdd = new ArrayList();
+        
+        productos.forEach(prod -> objToAdd.add(
+            new Object[]{
+                prod.getProducto().getId(),
+                prod.getProducto().getPublicSalePrice(),
+                prod.getPrecio(),
+                prod.getProducto().getTitle(),
+                prod.getProducto().getCode()
+            }    
+        ));
+        
+
+        DefaultTableModel modeloPP = (DefaultTableModel) TableProvidersProducts.getModel();
+        
+        objToAdd.forEach(obj -> modeloPP.addRow(obj));
+        
+        TableProvidersProducts.setModel(modeloPP);
+        ////////////////////////////////////////
+        
+        modalProviderFrame.getContentPane().add(modalProvider);
+        modalProviderFrame.pack();
+        modalProviderFrame.setVisible(true);
+    }
+    
     public void LoadProductos() {
         List<Object[]> objToAdd = new ArrayList();
         try {
@@ -403,6 +509,13 @@ public class Sistema extends javax.swing.JFrame {
         jLabel27 = new javax.swing.JLabel();
         ventaDetalleFecha = new javax.swing.JTextField();
         updateEnabledGroup = new javax.swing.ButtonGroup();
+        modalProvider = new javax.swing.JPanel();
+        jScrollPane7 = new javax.swing.JScrollPane();
+        TableProvidersProducts = new javax.swing.JTable();
+        jLabel28 = new javax.swing.JLabel();
+        jLabel29 = new javax.swing.JLabel();
+        providerNombre = new javax.swing.JTextField();
+        providerTaxPayerID = new javax.swing.JTextField();
         jPanel2 = new javax.swing.JPanel();
         menuVentasBtn = new javax.swing.JButton();
         menuProductosBtn = new javax.swing.JButton();
@@ -901,6 +1014,72 @@ public class Sistema extends javax.swing.JFrame {
                     .addComponent(jLabel20)
                     .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 297, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(71, Short.MAX_VALUE))
+        );
+
+        TableProvidersProducts.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null}
+            },
+            new String [] {
+                "ID", "PDV", "PCP", "TITULO", "CODIGO"
+            }
+        ));
+        jScrollPane7.setViewportView(TableProvidersProducts);
+
+        jLabel28.setText("RAZON SOCIAL");
+
+        jLabel29.setText("CUIT/CUIL");
+
+        providerNombre.setEditable(false);
+        providerNombre.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                providerNombreActionPerformed(evt);
+            }
+        });
+
+        providerTaxPayerID.setEditable(false);
+        providerTaxPayerID.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                providerTaxPayerIDActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout modalProviderLayout = new javax.swing.GroupLayout(modalProvider);
+        modalProvider.setLayout(modalProviderLayout);
+        modalProviderLayout.setHorizontalGroup(
+            modalProviderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(modalProviderLayout.createSequentialGroup()
+                .addGap(27, 27, 27)
+                .addGroup(modalProviderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(modalProviderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addGroup(modalProviderLayout.createSequentialGroup()
+                            .addComponent(jLabel29)
+                            .addGap(46, 46, 46)
+                            .addComponent(providerTaxPayerID, javax.swing.GroupLayout.DEFAULT_SIZE, 328, Short.MAX_VALUE))
+                        .addGroup(modalProviderLayout.createSequentialGroup()
+                            .addComponent(jLabel28)
+                            .addGap(18, 18, 18)
+                            .addComponent(providerNombre)))
+                    .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 641, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(27, Short.MAX_VALUE))
+        );
+        modalProviderLayout.setVerticalGroup(
+            modalProviderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, modalProviderLayout.createSequentialGroup()
+                .addGap(15, 15, 15)
+                .addGroup(modalProviderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel28)
+                    .addComponent(providerNombre, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(modalProviderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel29)
+                    .addComponent(providerTaxPayerID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 38, Short.MAX_VALUE)
+                .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(22, 22, 22))
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -1513,6 +1692,12 @@ public class Sistema extends javax.swing.JFrame {
         modalFrame.setVisible(true);
     }
 
+    private void initializeProvidersProductsModal() {
+        modalProviderFrame.setAlwaysOnTop(true); //Esto nos permite que el jFrame sea un modal
+        modalProviderFrame.setLocationRelativeTo(null);
+        modalProviderFrame.setVisible(true);
+    }
+    
     private void initializeUpdateModal() {
         modalUpdateFrame.setAlwaysOnTop(true); //Esto nos permite que el jFrame sea un modal
         modalUpdateFrame.setLocationRelativeTo(null);
@@ -2107,7 +2292,8 @@ public class Sistema extends javax.swing.JFrame {
         String desc = descValue.toString();
 
         String codi = TableProducto.getValueAt(filaSeleccionada, model.findColumn("CODIGO")).toString();
-        String proveedor = TableProducto.getValueAt(filaSeleccionada, model.findColumn("PROVEEDOR")).toString();
+        // TODO: Popular desplegable de proveedores
+        String proveedor = "";//TableProducto.getValueAt(filaSeleccionada, model.findColumn("PROVEEDOR")).toString();
         String categoria = TableProducto.getValueAt(filaSeleccionada, model.findColumn("CATEGORIA")).toString();
         String ID = TableProducto.getValueAt(filaSeleccionada, model.findColumn("ID")).toString();
 
@@ -2374,6 +2560,14 @@ public class Sistema extends javax.swing.JFrame {
         LoadProviders();
     }//GEN-LAST:event_menuProveedoresBtnActionPerformed
 
+    private void providerNombreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_providerNombreActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_providerNombreActionPerformed
+
+    private void providerTaxPayerIDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_providerTaxPayerIDActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_providerTaxPayerIDActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -2420,6 +2614,7 @@ public class Sistema extends javax.swing.JFrame {
     public javax.swing.JTextField PrecioUni;
     private javax.swing.JTable TableProducto;
     private javax.swing.JTable TableProvider;
+    private javax.swing.JTable TableProvidersProducts;
     private javax.swing.JTable TableVenta;
     private javax.swing.JTable TableVentaDetalle;
     private javax.swing.JTable TableVentasHistorico;
@@ -2463,6 +2658,8 @@ public class Sistema extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel25;
     private javax.swing.JLabel jLabel26;
     private javax.swing.JLabel jLabel27;
+    private javax.swing.JLabel jLabel28;
+    private javax.swing.JLabel jLabel29;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel33;
     private javax.swing.JLabel jLabel34;
@@ -2483,6 +2680,7 @@ public class Sistema extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane5;
+    private javax.swing.JScrollPane jScrollPane7;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTextField jtxtFiltro;
     private javax.swing.JLabel labelUpdateID;
@@ -2492,6 +2690,7 @@ public class Sistema extends javax.swing.JFrame {
     private javax.swing.JButton menuVentasBtn;
     private javax.swing.JPanel modalDetalle;
     private javax.swing.JPanel modalProgressBar;
+    private javax.swing.JPanel modalProvider;
     private javax.swing.JPanel modalUpdate;
     private javax.swing.JPanel nuevaVentaPanel;
     private javax.swing.JLabel paymentCashErrorLabel;
@@ -2501,6 +2700,8 @@ public class Sistema extends javax.swing.JFrame {
     private javax.swing.JTabbedPane principalPanel;
     private javax.swing.JLabel productsErrorDisplay;
     private javax.swing.JPanel proveedoresPanel;
+    private javax.swing.JTextField providerNombre;
+    private javax.swing.JTextField providerTaxPayerID;
     private javax.swing.JTextField txtCantIni;
     private javax.swing.JTextField txtCantidadVenta;
     private javax.swing.JTextField txtCod;
