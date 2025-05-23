@@ -84,7 +84,7 @@ public class Product implements BaseTableModel {
     public Object[] toArray() {
         Object[] values = new Object[]{
             this.id,
-            this.unitaryPrice,
+            this.publicSalePrice,
             this.initialQuantity,
             this.title,
             this.description,
@@ -97,7 +97,7 @@ public class Product implements BaseTableModel {
     }
     
     public static String[] getColumnNames() {
-        return new String[]{ "ID", "PRECIO UNITARIO", "CANTIDAD INICIAL", "TITULO", "DESCRIPCION", "CODIGO", "CATEGORIA", "ESTADO"};
+        return new String[]{ "ID", "PRECIO DE VENTA", "CANTIDAD INICIAL", "TITULO", "DESCRIPCION", "CODIGO", "CATEGORIA", "ESTADO"};
     }
     
     public Product(

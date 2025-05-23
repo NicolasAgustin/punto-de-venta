@@ -1682,6 +1682,11 @@ public class Sistema extends javax.swing.JFrame {
             cbxProveedorPro.addItem(prov.getDescription() + " " + prov.getTaxPayerId());
         }
         
+        // TODO: Ver flujo de carga de productos contemplando los proveedores y precios x proveedor
+        // cuando agrego un producto, tengo que agregar el producto al proveedor
+        // y tomar el valor que se ingreso, sumarle 10%
+        // con esto hay que modificar el metodo providersIngest para que el calculo del precio se haga en base al precio que tiene inicialmente el producto
+        
         LoadProductos();
     }//GEN-LAST:event_menuProductosBtnActionPerformed
 

@@ -6,6 +6,8 @@ import java.sql.SQLException;
 import java.util.List;
 
 import Persistence.Store;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -117,9 +119,7 @@ public class ProductsService {
                         ppp = new PrecioProveedorProducto();
                         ppp.setId(pppId); 
                         ppp.setProducto(currentProduct); 
-                        ppp.setProveedor(provider);     
-                        
-                        // ¡NUEVO!: Persistir explícitamente el nuevo PrecioProveedorProducto
+                        ppp.setProveedor(provider);
                         session.persist(ppp); // <-- ¡Línea agregada!
                         
                         // Añadir a las colecciones del producto y proveedor
@@ -130,12 +130,14 @@ public class ProductsService {
                     
                     // En este punto, 'ppp' es una instancia gestionada (ya sea encontrada o recién persistida).
 
-                    double randomPrice = random.nextDouble() * (5000 + Double.MIN_VALUE);
-                    ppp.setPrecio(randomPrice); // Actualizar el precio (siempre)
+                    double randomPrice = 1000.0 + (5000.0 - 1000.0) * random.nextDouble();
+                    BigDecimal bd = new BigDecimal(randomPrice).setScale(2, RoundingMode.HALF_UP);
+                    double roundedPrice = bd.doubleValue();
+                    ppp.setPrecio(roundedPrice); // Actualizar el precio (siempre)
 
                     // TODO: Redondear precio
                     // Actualizar el precio de venta al público del producto
-                    currentProduct.setPublicSalePrice(randomPrice * 0.10);
+                    currentProduct.setPublicSalePrice(new BigDecimal(roundedPrice + roundedPrice * 0.10).setScale(2, RoundingMode.HALF_UP).doubleValue());
                 }
                 // Fusionar el producto al final del bucle interno de proveedores.
                 // Esto cascadeará los cambios (incluyendo las actualizaciones de PrecioProveedorProducto).
