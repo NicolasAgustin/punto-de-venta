@@ -21,7 +21,7 @@ public class PrecioProveedorProducto {
     @JoinColumn(name = "proveedor_id") // Columna de la clave foránea
     private Provider proveedor;
 
-    private double precio;
+    private double precioCompra;
 
     // Getters y setters para el ID, producto, proveedor y precio
 
@@ -59,12 +59,12 @@ public class PrecioProveedorProducto {
         this.id.setProveedorId(proveedor.getId());
     }
 
-    public double getPrecio() {
-        return precio;
+    public double getPrecioCompra() {
+        return this.precioCompra;
     }
 
-    public void setPrecio(double precio) {
-        this.precio = precio;
+    public void setPrecioCompra(double precio) {
+        this.precioCompra = precio;
     }
     
     @Override

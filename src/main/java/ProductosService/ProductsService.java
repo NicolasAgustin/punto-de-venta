@@ -35,9 +35,9 @@ public class ProductsService {
         Product[] products = new Product[] {
             new Product(0, (float) 1600, 10, "Jugo de arandanos", "", "0", "Alimento", true),
             new Product(0, (float) 700, 20, "Leche largavida", "", "1", "Alimento", true),
-            new Product(0, (float) 2500, 10, "Jugo de naranjas", "", "2", "Alimento", true),
-            new Product(0, (float) 2500, 10, "Gaseosa pepsi 2.25lt", "", "3", "Alimento", true),
-            new Product(0, (float) 1500, 10, "Monster energy", "", "4", "Alimento", true),
+            new Product(0, (float) 2500, 25, "Jugo de naranjas", "", "2", "Alimento", true),
+            new Product(0, (float) 2500, 150, "Gaseosa pepsi 2.25lt", "", "3", "Alimento", true),
+            new Product(0, (float) 1500, 8, "Monster energy", "", "4", "Alimento", true),
         };
         
         for (Product product : products) {
@@ -133,11 +133,11 @@ public class ProductsService {
                     double randomPrice = 1000.0 + (5000.0 - 1000.0) * random.nextDouble();
                     BigDecimal bd = new BigDecimal(randomPrice).setScale(2, RoundingMode.HALF_UP);
                     double roundedPrice = bd.doubleValue();
-                    ppp.setPrecio(roundedPrice); // Actualizar el precio (siempre)
+                    ppp.setPrecioCompra(roundedPrice); // Actualizar el precio (siempre)
 
                     // TODO: Redondear precio
                     // Actualizar el precio de venta al público del producto
-                    currentProduct.setPublicSalePrice(new BigDecimal(roundedPrice + roundedPrice * 0.10).setScale(2, RoundingMode.HALF_UP).doubleValue());
+                    //currentProduct.setPublicSalePrice(new BigDecimal(roundedPrice + roundedPrice * 0.10).setScale(2, RoundingMode.HALF_UP).doubleValue());
                 }
                 // Fusionar el producto al final del bucle interno de proveedores.
                 // Esto cascadeará los cambios (incluyendo las actualizaciones de PrecioProveedorProducto).
@@ -168,6 +168,19 @@ public class ProductsService {
                 .getResultList();
                 
         return products;
+    }
+    
+    public List<PrecioProveedorProducto> getProvidersByProduct(int productID) {
+        Session session = null;
+        
+        session = this.store.createSession(); 
+        session.beginTransaction();
+        List<PrecioProveedorProducto> proveedores = session
+                .createQuery("FROM PrecioProveedorProducto ppp WHERE ppp.producto.id = :productId", PrecioProveedorProducto.class)
+                .setParameter("productId", productID)
+                .getResultList();
+                
+        return proveedores;
     }
     
     public List<Category> getProductsCategories() {

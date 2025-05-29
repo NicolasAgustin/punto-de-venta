@@ -51,6 +51,9 @@ public class Product implements BaseTableModel {
     @Column(name="description", length=100)
     private String description = null;
     
+    @Column(name="inventory_enabled")
+    private boolean inventoryEnabled;
+    
     @Column(name="code", length=50)
     private String code;
     
@@ -102,7 +105,7 @@ public class Product implements BaseTableModel {
     
     public Product(
         int id,
-        Float unitaryPrice,
+        double publicSalePrice,
         int initialQuantity,
         String title,
         String descripcion,
@@ -112,10 +115,10 @@ public class Product implements BaseTableModel {
     ) {
        
         this.id = id;
-        this.unitaryPrice = unitaryPrice;
+        this.publicSalePrice = publicSalePrice;
         this.initialQuantity = initialQuantity;
         this.title = title;
-        this.description = description;
+        this.description = descripcion;
         //Esto es para el codigo de barra Ej 12312312312312312312423346544324124123
         this.code = code;
         this.category = category;

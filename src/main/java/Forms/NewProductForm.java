@@ -26,8 +26,7 @@ public class NewProductForm {
     public NewProductForm(
             String title,
             String description, 
-            String code, 
-            String proveedor, 
+            String code,
             String categoria, 
             String unitary_price, 
             String initial_quantity
@@ -35,7 +34,6 @@ public class NewProductForm {
         this.title = title;
         this.description = description;
         this.code = code;
-        this.proveedor = proveedor;
         this.categoria = categoria;
         this.unitary_price = unitary_price;
         this.initial_quantity = initial_quantity;
