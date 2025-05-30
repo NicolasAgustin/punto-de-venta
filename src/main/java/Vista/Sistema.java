@@ -346,6 +346,10 @@ public class Sistema extends javax.swing.JFrame {
         modalProviderFrame.getContentPane().add(modalProvider);
         modalProviderFrame.pack();
         modalProviderFrame.setVisible(true);
+        
+        modalProviderLinkLabel.setText(razon_social + " " + tax_payer_id);
+        modalProviderLinkIDLabel.setVisible(false);
+        modalProviderLinkIDLabel.setText(providerID + "");
     }
     
     public void LoadProductos() {
@@ -517,6 +521,12 @@ public class Sistema extends javax.swing.JFrame {
         jLabel29 = new javax.swing.JLabel();
         providerNombre = new javax.swing.JTextField();
         providerTaxPayerID = new javax.swing.JTextField();
+        vincularProductosButton = new javax.swing.JButton();
+        modalProviderLinkProductos = new javax.swing.JPanel();
+        modalProviderLinkLabel = new javax.swing.JLabel();
+        modalProviderLinkIDLabel = new javax.swing.JLabel();
+        jScrollPane8 = new javax.swing.JScrollPane();
+        jList4 = new javax.swing.JList<>();
         jPanel2 = new javax.swing.JPanel();
         menuVentasBtn = new javax.swing.JButton();
         menuProductosBtn = new javax.swing.JButton();
@@ -1068,23 +1078,33 @@ public class Sistema extends javax.swing.JFrame {
             }
         });
 
+        vincularProductosButton.setText("Vincular Productos");
+        vincularProductosButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                vincularProductosButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout modalProviderLayout = new javax.swing.GroupLayout(modalProvider);
         modalProvider.setLayout(modalProviderLayout);
         modalProviderLayout.setHorizontalGroup(
             modalProviderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(modalProviderLayout.createSequentialGroup()
                 .addGap(27, 27, 27)
-                .addGroup(modalProviderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(modalProviderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addGroup(modalProviderLayout.createSequentialGroup()
-                            .addComponent(jLabel29)
-                            .addGap(46, 46, 46)
-                            .addComponent(providerTaxPayerID, javax.swing.GroupLayout.DEFAULT_SIZE, 328, Short.MAX_VALUE))
-                        .addGroup(modalProviderLayout.createSequentialGroup()
-                            .addComponent(jLabel28)
-                            .addGap(18, 18, 18)
-                            .addComponent(providerNombre)))
-                    .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 641, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(modalProviderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(modalProviderLayout.createSequentialGroup()
+                        .addGroup(modalProviderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(modalProviderLayout.createSequentialGroup()
+                                .addComponent(jLabel29)
+                                .addGap(46, 46, 46)
+                                .addComponent(providerTaxPayerID, javax.swing.GroupLayout.DEFAULT_SIZE, 328, Short.MAX_VALUE))
+                            .addGroup(modalProviderLayout.createSequentialGroup()
+                                .addComponent(jLabel28)
+                                .addGap(18, 18, 18)
+                                .addComponent(providerNombre)))
+                        .addGap(18, 18, 18)
+                        .addComponent(vincularProductosButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jScrollPane7, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 641, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(27, Short.MAX_VALUE))
         );
         modalProviderLayout.setVerticalGroup(
@@ -1097,10 +1117,48 @@ public class Sistema extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(modalProviderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel29)
-                    .addComponent(providerTaxPayerID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 38, Short.MAX_VALUE)
+                    .addGroup(modalProviderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(providerTaxPayerID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(vincularProductosButton)))
+                .addGap(18, 18, 18)
                 .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(22, 22, 22))
+                .addContainerGap(41, Short.MAX_VALUE))
+        );
+
+        modalProviderLinkLabel.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+
+        modalProviderLinkIDLabel.setText("jLabel8");
+
+        jList4.setModel(new javax.swing.AbstractListModel<String>() {
+            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+            public int getSize() { return strings.length; }
+            public String getElementAt(int i) { return strings[i]; }
+        });
+        jScrollPane8.setViewportView(jList4);
+
+        javax.swing.GroupLayout modalProviderLinkProductosLayout = new javax.swing.GroupLayout(modalProviderLinkProductos);
+        modalProviderLinkProductos.setLayout(modalProviderLinkProductosLayout);
+        modalProviderLinkProductosLayout.setHorizontalGroup(
+            modalProviderLinkProductosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(modalProviderLinkProductosLayout.createSequentialGroup()
+                .addGap(47, 47, 47)
+                .addGroup(modalProviderLinkProductosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(modalProviderLinkLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 608, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(modalProviderLinkProductosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addComponent(modalProviderLinkIDLabel)
+                        .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, 265, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        modalProviderLinkProductosLayout.setVerticalGroup(
+            modalProviderLinkProductosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(modalProviderLinkProductosLayout.createSequentialGroup()
+                .addGap(23, 23, 23)
+                .addComponent(modalProviderLinkLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 53, Short.MAX_VALUE)
+                .addComponent(modalProviderLinkIDLabel)
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(56, Short.MAX_VALUE))
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -1283,7 +1341,7 @@ public class Sistema extends javax.swing.JFrame {
                         .addGroup(nuevaVentaPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel3)
                             .addComponent(jLabel5))
-                        .addGap(0, 7, Short.MAX_VALUE)
+                        .addGap(0, 72, Short.MAX_VALUE)
                         .addGroup(nuevaVentaPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(txtCantidadVenta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(txtCodigoProducto, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -1355,7 +1413,7 @@ public class Sistema extends javax.swing.JFrame {
         ventasHistPanelLayout.setVerticalGroup(
             ventasHistPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, ventasHistPanelLayout.createSequentialGroup()
-                .addContainerGap(15, Short.MAX_VALUE)
+                .addContainerGap(80, Short.MAX_VALUE)
                 .addComponent(btnMostrarDetalle)
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 395, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1646,7 +1704,7 @@ public class Sistema extends javax.swing.JFrame {
             proveedoresPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(proveedoresPanelLayout.createSequentialGroup()
                 .addGap(28, 28, 28)
-                .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 441, Short.MAX_VALUE)
+                .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 506, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -1715,6 +1773,13 @@ public class Sistema extends javax.swing.JFrame {
         modalVentaFrame.setLocationRelativeTo(null);
        // modalVentaFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         modalVentaFrame.setVisible(true);
+    }
+     
+    private void initializeModal(JFrame modal) {
+        modal.setAlwaysOnTop(true);
+        modal.setLocationRelativeTo(null);
+        modal.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        modal.setVisible(true);
     }
 
 
@@ -2306,11 +2371,6 @@ public class Sistema extends javax.swing.JFrame {
         String enabledStatus = TableProducto.getValueAt(filaSeleccionada, model.findColumn("ESTADO")).toString();
         initializeUpdateModal();
 
-        // Inicializamos el modal
-        modalUpdateFrame.getContentPane().add(modalUpdate);
-        modalUpdateFrame.pack();
-        modalUpdateFrame.setVisible(true);
-
         // Crear una instancia de Detalle
         //            Detalle detalle = new Detalle(this, true);
         // Establecer los valores obtenidos en los campos del formulario Detalle
@@ -2353,6 +2413,11 @@ public class Sistema extends javax.swing.JFrame {
         }
         
         productProveedoresTable.setModel(modelProveedores);
+        
+        // Inicializamos el modal
+        modalUpdateFrame.getContentPane().add(modalUpdate);
+        modalUpdateFrame.pack();
+        modalUpdateFrame.setVisible(true);
         
     }//GEN-LAST:event_btnEditarproActionPerformed
 
@@ -2591,6 +2656,19 @@ public class Sistema extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_providerTaxPayerIDActionPerformed
 
+    private void vincularProductosButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_vincularProductosButtonActionPerformed
+        // TODO add your handling code here:
+        JFrame modal = new JFrame();
+
+        modalProviderLinkLabel.setText("");
+        
+        // Mostrar modal para linkear productos
+        modal.getContentPane().add(modalProviderLinkProductos);
+        modal.pack();
+        initializeModal(modal);
+        
+    }//GEN-LAST:event_vincularProductosButtonActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -2691,6 +2769,7 @@ public class Sistema extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel9;
     public javax.swing.JLabel jLabelCod;
+    private javax.swing.JList<String> jList4;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel8;
@@ -2702,6 +2781,7 @@ public class Sistema extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JScrollPane jScrollPane7;
+    private javax.swing.JScrollPane jScrollPane8;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTextField jtxtFiltro;
     private javax.swing.JLabel labelUpdateID;
@@ -2712,6 +2792,9 @@ public class Sistema extends javax.swing.JFrame {
     private javax.swing.JPanel modalDetalle;
     private javax.swing.JPanel modalProgressBar;
     private javax.swing.JPanel modalProvider;
+    private javax.swing.JLabel modalProviderLinkIDLabel;
+    private javax.swing.JLabel modalProviderLinkLabel;
+    private javax.swing.JPanel modalProviderLinkProductos;
     private javax.swing.JPanel modalUpdate;
     private javax.swing.JPanel nuevaVentaPanel;
     private javax.swing.JLabel paymentCashErrorLabel;
@@ -2739,6 +2822,7 @@ public class Sistema extends javax.swing.JFrame {
     private javax.swing.JTextField ventaDetalleTotal;
     private javax.swing.JButton ventasButton;
     private javax.swing.JPanel ventasHistPanel;
+    private javax.swing.JButton vincularProductosButton;
     // End of variables declaration//GEN-END:variables
 
     private void Limpiarproducto() {//limpia los campos
