@@ -157,30 +157,111 @@ public class ProductsService {
         }
     }
     
+    public Provider getProviderByTaxPayerID(String taxPayerID) {
+        Session session = null;
+        
+        try {
+            session = this.store.createSession(); 
+            session.beginTransaction();
+            Provider provider = session
+                    .createQuery("FROM Provider WHERE taxPayerId = :taxPayerID", Provider.class)
+                    .setParameter("taxPayerID", taxPayerID)
+                    .getSingleResult();
+            return provider;
+        } catch (Exception ex) {
+            if (session != null && session.getTransaction().isActive()) {
+                session.getTransaction().rollback(); // Rollback en caso de error
+            }
+            System.err.println("Error al buscar entidad por ID: " + ex.getMessage()); // Usa System.err para errores
+            return null;
+        } finally {
+            if (session != null && session.isOpen()) {
+                session.close(); // Cierra la sesión
+            }
+        }       
+    }
+    
     public List<PrecioProveedorProducto> getProductsByProvider(int providerID) {
         Session session = null;
         
-        session = this.store.createSession(); 
-        session.beginTransaction();
-        List<PrecioProveedorProducto> products = session
-                .createQuery("FROM PrecioProveedorProducto ppp WHERE ppp.proveedor.id = :proveedorId", PrecioProveedorProducto.class)
-                .setParameter("proveedorId", providerID)
-                .getResultList();
-                
-        return products;
+        try {
+            session = this.store.createSession(); 
+            session.beginTransaction();
+            List<PrecioProveedorProducto> products = session
+                    .createQuery("FROM PrecioProveedorProducto ppp WHERE ppp.proveedor.id = :proveedorId", PrecioProveedorProducto.class)
+                    .setParameter("proveedorId", providerID)
+                    .getResultList();
+            return products;
+        } finally {
+//            if (session != null && session.isOpen()) {
+//                session.close(); // Cierra la sesión
+//            }
+        }
+    }
+    
+    public Provider getProviderByID(int providerID) {
+        Session session = null;
+        Provider entity = null;
+        
+        try {
+            session = this.store.createSession(); 
+            session.beginTransaction();
+            
+            entity = session.find(Provider.class, providerID); // Usa session.find() para buscar por ID
+            session.getTransaction().commit(); // Confirma la transacción
+        } catch (Exception ex) {
+            if (session != null && session.getTransaction().isActive()) {
+                session.getTransaction().rollback(); // Rollback en caso de error
+            }
+            System.err.println("Error al buscar entidad por ID: " + ex.getMessage()); // Usa System.err para errores
+            return null;
+        } finally {
+            if (session != null && session.isOpen()) {
+                session.close(); // Cierra la sesión
+            }
+        }
+        return entity;
     }
     
     public List<PrecioProveedorProducto> getProvidersByProduct(int productID) {
         Session session = null;
         
+        try {
+            session = this.store.createSession(); 
+            session.beginTransaction();
+            List<PrecioProveedorProducto> proveedores = session
+                    .createQuery("FROM PrecioProveedorProducto ppp WHERE ppp.producto.id = :productId", PrecioProveedorProducto.class)
+                    .setParameter("productId", productID)
+                    .getResultList();
+                
+            return proveedores;
+        } finally {
+            if (session != null && session.isOpen()) {
+                session.close(); // Cierra la sesión
+            }
+        }
+    }
+    
+    public PrecioProveedorProducto getPrecioProveedorProducto(int proveedorID, int productoID){
+        
+        Session session = null;
+        
         session = this.store.createSession(); 
         session.beginTransaction();
-        List<PrecioProveedorProducto> proveedores = session
-                .createQuery("FROM PrecioProveedorProducto ppp WHERE ppp.producto.id = :productId", PrecioProveedorProducto.class)
-                .setParameter("productId", productID)
-                .getResultList();
-                
-        return proveedores;
+        
+        try{
+            PrecioProveedorProducto.PrecioProveedorProductoId pppId = new PrecioProveedorProducto
+                .PrecioProveedorProductoId(productoID, proveedorID);
+
+            PrecioProveedorProducto ppp = session.find(PrecioProveedorProducto.class, pppId);
+            return ppp;
+        }catch(Exception ex){
+            return null;
+        } finally {
+            if (session != null && session.isOpen()) {
+                session.close(); // Cierra la sesión
+            }
+        }
     }
     
     public List<Category> getProductsCategories() {

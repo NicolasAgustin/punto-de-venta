@@ -133,6 +133,10 @@ public class Product implements BaseTableModel {
         this.preciosPorProveedor = preciosPorProveedor;
     }
     
+    public boolean hasProvider(Provider provider) {
+        return this.preciosPorProveedor.contains(provider);
+    }
+    
     public void agregarPrecioProveedor(PrecioProveedorProducto precioProveedorProducto) {
         this.preciosPorProveedor.add(precioProveedorProducto);
         precioProveedorProducto.setProducto(this);
