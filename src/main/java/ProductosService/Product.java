@@ -134,7 +134,12 @@ public class Product implements BaseTableModel {
     }
     
     public boolean hasProvider(Provider provider) {
-        return this.preciosPorProveedor.contains(provider);
+        for (PrecioProveedorProducto ppp: this.preciosPorProveedor){
+            if (ppp.getProveedor().getId() == provider.getId()) {
+                return true;
+            }
+        }
+        return false;
     }
     
     public void agregarPrecioProveedor(PrecioProveedorProducto precioProveedorProducto) {

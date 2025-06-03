@@ -30,6 +30,7 @@ import VentasService.Detail;
 import VentasService.Sale;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.FocusTraversalPolicy;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -530,6 +531,9 @@ public class Sistema extends javax.swing.JFrame {
         productToLinkTextField = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
+        jLabel8 = new javax.swing.JLabel();
+        jLabel30 = new javax.swing.JLabel();
+        jLabel31 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         menuVentasBtn = new javax.swing.JButton();
         menuProductosBtn = new javax.swing.JButton();
@@ -1143,7 +1147,7 @@ public class Sistema extends javax.swing.JFrame {
             }
         });
 
-        jButton1.setText("Vincular");
+        jButton1.setText("Vincular Seleccionados");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -1157,38 +1161,55 @@ public class Sistema extends javax.swing.JFrame {
             }
         });
 
+        jLabel8.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabel8.setText("Productos vinculables:");
+
+        jLabel30.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
+        jLabel30.setText("(No se encuentran vinculados al proveedor actual)");
+
+        jLabel31.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabel31.setText("Buscar:");
+
         javax.swing.GroupLayout modalProviderLinkProductosLayout = new javax.swing.GroupLayout(modalProviderLinkProductos);
         modalProviderLinkProductos.setLayout(modalProviderLinkProductosLayout);
         modalProviderLinkProductosLayout.setHorizontalGroup(
             modalProviderLinkProductosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(modalProviderLinkProductosLayout.createSequentialGroup()
                 .addGap(47, 47, 47)
-                .addGroup(modalProviderLinkProductosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(modalProviderLinkProductosLayout.createSequentialGroup()
-                        .addComponent(productToLinkTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 271, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(jButton1))
-                    .addGroup(modalProviderLinkProductosLayout.createSequentialGroup()
+                .addGroup(modalProviderLinkProductosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel31)
+                    .addComponent(jLabel30)
+                    .addComponent(jLabel8)
+                    .addGroup(modalProviderLinkProductosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(jScrollPane8, javax.swing.GroupLayout.DEFAULT_SIZE, 362, Short.MAX_VALUE)
                         .addComponent(modalProviderLinkIDLabel)
-                        .addGap(18, 18, 18)
-                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 257, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jScrollPane8))
-                .addContainerGap(55, Short.MAX_VALUE))
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, modalProviderLinkProductosLayout.createSequentialGroup()
+                            .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGap(18, 18, 18)
+                            .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 168, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(productToLinkTextField)))
+                .addContainerGap(49, Short.MAX_VALUE))
         );
         modalProviderLinkProductosLayout.setVerticalGroup(
             modalProviderLinkProductosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(modalProviderLinkProductosLayout.createSequentialGroup()
-                .addGap(23, 23, 23)
+                .addContainerGap(48, Short.MAX_VALUE)
+                .addComponent(jLabel31)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(productToLinkTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jLabel8)
+                .addGap(2, 2, 2)
+                .addComponent(jLabel30)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(modalProviderLinkProductosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(productToLinkTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton2)
                     .addComponent(jButton1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addGroup(modalProviderLinkProductosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(modalProviderLinkIDLabel)
-                    .addComponent(jButton2))
-                .addContainerGap(28, Short.MAX_VALUE))
+                .addComponent(modalProviderLinkIDLabel)
+                .addGap(36, 36, 36))
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -1524,6 +1545,8 @@ public class Sistema extends javax.swing.JFrame {
         jLabel34.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel34.setText("Categoria:");
 
+        txtTit.setFocusTraversalPolicy(getFocusTraversalPolicy());
+        txtTit.setFocusTraversalPolicyProvider(true);
         txtTit.setName("field1"); // NOI18N
         txtTit.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1549,6 +1572,7 @@ public class Sistema extends javax.swing.JFrame {
             }
         });
 
+        txtCod.setFocusTraversalPolicyProvider(true);
         txtCod.setName("field3"); // NOI18N
         txtCod.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1760,6 +1784,25 @@ public class Sistema extends javax.swing.JFrame {
         principalPanel.setSelectedIndex(2);
         jtxtFiltro.setText("");
         LimpiarTable((DefaultTableModel) TableProducto.getModel());
+        
+        // FIXME: Arreglar tabbing entre controles
+        FocusTraversalPolicy customPolicy = new FocusTraversalOnArray(
+            new Component[]{
+                txtTit,
+                txtDesc,
+                txtCod,
+                cbxCatego,
+                txtPrecioUni,
+                txtCantIni,
+                btnSaveProducto,
+                btnEditarpro,
+                btnEliminarpro,
+                jtxtFiltro,
+                btnLimpiar
+            }
+        );
+        
+        jPanel5.setFocusTraversalPolicy(customPolicy);
         
         cbxCatego.removeAllItems();
         
@@ -2702,13 +2745,24 @@ public class Sistema extends javax.swing.JFrame {
             List<Product> products = this.productosService.list();
             // TODO: Agregar solo productos que NO estan vinculados al proveedor
             // No funciona el .contains hay que hacer una consulta a la base
+            
+            DefaultListModel<String> listModel = new DefaultListModel();
+            
             products.forEach(p -> {
                     if (!p.hasProvider(providerFound)){
-                        items.add(p.getId() + " " + p.getCode() + " " + p.getTitle());
+
+                        // TODO: Agregar separadores entre items de la lista
+                        // Poner el titulo en negrita
+                        // mostrar tambien el id del producto
+                        String strItem = "<html>Codigo: %s<br>Titulo: %s</span></html>";
+                        listModel.addElement(String.format(strItem, p.getCode(), p.getTitle()));
                     }
                 }
             );
-            providerLinkedProductsList.setListData(items.toArray(new String[0]));
+            
+            providerLinkedProductsList.setModel(listModel);
+            
+//            providerLinkedProductsList.setListData(items.toArray(new String[0]));
         }catch(Exception ex) {
             JOptionPane.showMessageDialog(null, ex.getMessage());
         }
@@ -2723,11 +2777,11 @@ public class Sistema extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
 //        providerLinkedProductsList
-        String productCode = productToLinkTextField.getText();
-        
-        if (productCode.equals("")) {
-            return;
-        }
+//        String productCode = productToLinkTextField.getText();
+//        
+//        if (productCode.equals("")) {
+//            return;
+//        }
         
         int providerID = Integer.parseInt(modalProviderLinkIDLabel.getText());
         
@@ -2885,6 +2939,8 @@ public class Sistema extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel28;
     private javax.swing.JLabel jLabel29;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel30;
+    private javax.swing.JLabel jLabel31;
     private javax.swing.JLabel jLabel33;
     private javax.swing.JLabel jLabel34;
     private javax.swing.JLabel jLabel35;
@@ -2892,6 +2948,7 @@ public class Sistema extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     public javax.swing.JLabel jLabelCod;
     private javax.swing.JPanel jPanel2;
