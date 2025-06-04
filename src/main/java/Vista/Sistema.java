@@ -51,6 +51,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import java.util.InputMismatchException;
+import java.util.Locale;
 import java.util.Set;
 import java.util.Vector;
 import java.util.regex.PatternSyntaxException;
@@ -58,6 +59,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.ListModel;
 import javax.swing.RowFilter;
 import javax.swing.Timer;
 import javax.swing.event.ListSelectionEvent;
@@ -187,8 +189,9 @@ public class Sistema extends javax.swing.JFrame {
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 // Verificar si la selección está finalizada y no hay ajustes en curso
-                if (!e.getValueIsAdjusting()) {
-                    // Llamar a la función que deseas ejecutar
+                // Si no chequeamos TableProvider.getSelectedRowCount() este listener se va a
+                // llamar en ocasiones inesperadas, mostrando el modal cuando no debe
+                if (!e.getValueIsAdjusting() && TableProvider.getSelectedRowCount() > 0) {
                     LoadProvidersProducts();
                 }
             }
@@ -252,6 +255,23 @@ public class Sistema extends javax.swing.JFrame {
         TableVentasHistorico.setColumnSelectionAllowed(false);
         
         LoadProductos();
+        
+        productToLinkTextField.getDocument().addDocumentListener(new DocumentListener(){
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                filterProviderLinkedProductsList(); // Se llama cuando se inserta texto
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                filterProviderLinkedProductsList(); // Se llama cuando se elimina texto
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                // Este evento es para cambios en atributos (no en texto simple), usualmente no se usa aquí.
+            }
+        });
 
         jtxtFiltro.addKeyListener(new KeyAdapter() {
             @Override
@@ -284,6 +304,38 @@ public class Sistema extends javax.swing.JFrame {
         });
     }
 
+    public void filterProviderLinkedProductsList() {
+        String value = productToLinkTextField.getText().toLowerCase(Locale.ROOT);
+        // String providerID = modalProviderLinkIDLabel.getText().split(" ")[0];
+        String taxPayerID = modalProviderLinkIDLabel.getText().split(" ")[1];
+        
+        try{
+            
+            List<Product> productsNotLinkedWithProvider = 
+                    this.productosService.getProductsNotLinkedToProvider(taxPayerID);
+            
+            if(value.equals("")) {
+                LoadProductsToJList(providerLinkedProductsList, productsNotLinkedWithProvider);
+                return;
+            }
+            
+            List<Product> filteredList = new ArrayList();
+            productsNotLinkedWithProvider.forEach(p -> {
+                if (p.getTitle().toLowerCase(Locale.ROOT).contains(value) || 
+                    p.getCode().toLowerCase(Locale.ROOT).contains(value)) {
+                    filteredList.add(p);
+                }
+            });
+            
+            LoadProductsToJList(providerLinkedProductsList, filteredList);
+            
+        }catch(Exception ex) {
+            JOptionPane.showMessageDialog(null, ex.getMessage());
+        }
+        
+        
+    }
+    
     public void LoadProvidersProducts() {
         initializeProvidersProductsModal();
         
@@ -351,7 +403,7 @@ public class Sistema extends javax.swing.JFrame {
         modalProviderFrame.pack();
         modalProviderFrame.setVisible(true);
         modalProviderLinkIDLabel.setVisible(false);
-        modalProviderLinkIDLabel.setText(providerID + "");
+        modalProviderLinkIDLabel.setText(providerID + " " + tax_payer_id);
     }
     
     public void LoadProductos() {
@@ -534,6 +586,7 @@ public class Sistema extends javax.swing.JFrame {
         jLabel8 = new javax.swing.JLabel();
         jLabel30 = new javax.swing.JLabel();
         jLabel31 = new javax.swing.JLabel();
+        jButton3 = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         menuVentasBtn = new javax.swing.JButton();
         menuProductosBtn = new javax.swing.JButton();
@@ -1170,6 +1223,13 @@ public class Sistema extends javax.swing.JFrame {
         jLabel31.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel31.setText("Buscar:");
 
+        jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/trash-can (1).png"))); // NOI18N
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout modalProviderLinkProductosLayout = new javax.swing.GroupLayout(modalProviderLinkProductos);
         modalProviderLinkProductos.setLayout(modalProviderLinkProductosLayout);
         modalProviderLinkProductosLayout.setHorizontalGroup(
@@ -1180,20 +1240,23 @@ public class Sistema extends javax.swing.JFrame {
                     .addComponent(jLabel31)
                     .addComponent(jLabel30)
                     .addComponent(jLabel8)
-                    .addGroup(modalProviderLinkProductosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(jScrollPane8, javax.swing.GroupLayout.DEFAULT_SIZE, 362, Short.MAX_VALUE)
-                        .addComponent(modalProviderLinkIDLabel)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, modalProviderLinkProductosLayout.createSequentialGroup()
-                            .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addGap(18, 18, 18)
-                            .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 168, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addComponent(productToLinkTextField)))
-                .addContainerGap(49, Short.MAX_VALUE))
+                    .addGroup(modalProviderLinkProductosLayout.createSequentialGroup()
+                        .addGroup(modalProviderLinkProductosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jScrollPane8, javax.swing.GroupLayout.DEFAULT_SIZE, 362, Short.MAX_VALUE)
+                            .addComponent(modalProviderLinkIDLabel)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, modalProviderLinkProductosLayout.createSequentialGroup()
+                                .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGap(18, 18, 18)
+                                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 168, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(productToLinkTextField))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(39, Short.MAX_VALUE))
         );
         modalProviderLinkProductosLayout.setVerticalGroup(
             modalProviderLinkProductosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(modalProviderLinkProductosLayout.createSequentialGroup()
-                .addContainerGap(48, Short.MAX_VALUE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel31)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(productToLinkTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1202,14 +1265,16 @@ public class Sistema extends javax.swing.JFrame {
                 .addGap(2, 2, 2)
                 .addComponent(jLabel30)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(modalProviderLinkProductosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(modalProviderLinkProductosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton2)
                     .addComponent(jButton1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(modalProviderLinkIDLabel)
-                .addGap(36, 36, 36))
+                .addContainerGap(31, Short.MAX_VALUE))
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -2729,40 +2794,42 @@ public class Sistema extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_providerTaxPayerIDActionPerformed
 
+    private void LoadProductsToJList(JList list, List<Product> productsToAdd) {
+//        DefaultListModel<String> lModel = (DefaultListModel) list.getModel();
+//        lModel.clear();
+        
+        DefaultListModel<String> newListModel = new DefaultListModel();
+        
+        productsToAdd.forEach(p -> {
+                // mostrar tambien el id del producto
+                String strItem = "<html><p style=\"font:bold\">%s</p>Codigo: %s</span></html>";
+                newListModel.addElement(String.format(strItem, p.getTitle(), p.getCode()));
+            }
+        );
+        
+        list.setModel(newListModel);
+    }
+    
     private void vincularProductosButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_vincularProductosButtonActionPerformed
         // TODO add your handling code here:
         
-        String taxPayerID = providerTaxPayerID.getText();
+        String providerID = modalProviderLinkIDLabel.getText().split(" ")[0];
+        String taxPayerID = modalProviderLinkIDLabel.getText().split(" ")[1];
         
         try{
             Provider providerFound = this.productosService.getProviderByTaxPayerID(taxPayerID);
             
             if (providerFound == null) {
+                JOptionPane.showMessageDialog(null, "Proveedor nulo");
                 return;
             }
             
-            List<String> items = new ArrayList();
-            List<Product> products = this.productosService.list();
-            // TODO: Agregar solo productos que NO estan vinculados al proveedor
-            // No funciona el .contains hay que hacer una consulta a la base
+            List<Product> productsNotLinkedWithProvider = 
+                    this.productosService.getProductsNotLinkedToProvider(taxPayerID);
             
-            DefaultListModel<String> listModel = new DefaultListModel();
             
-            products.forEach(p -> {
-                    if (!p.hasProvider(providerFound)){
-
-                        // TODO: Agregar separadores entre items de la lista
-                        // Poner el titulo en negrita
-                        // mostrar tambien el id del producto
-                        String strItem = "<html>Codigo: %s<br>Titulo: %s</span></html>";
-                        listModel.addElement(String.format(strItem, p.getCode(), p.getTitle()));
-                    }
-                }
-            );
+            LoadProductsToJList(providerLinkedProductsList, productsNotLinkedWithProvider);
             
-            providerLinkedProductsList.setModel(listModel);
-            
-//            providerLinkedProductsList.setListData(items.toArray(new String[0]));
         }catch(Exception ex) {
             JOptionPane.showMessageDialog(null, ex.getMessage());
         }
@@ -2774,34 +2841,78 @@ public class Sistema extends javax.swing.JFrame {
         
     }//GEN-LAST:event_vincularProductosButtonActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
-//        providerLinkedProductsList
-//        String productCode = productToLinkTextField.getText();
-//        
-//        if (productCode.equals("")) {
-//            return;
-//        }
-        
+        modalProviderLinkProductsFrame.setVisible(false);
+
         int providerID = Integer.parseInt(modalProviderLinkIDLabel.getText());
+        LoadProductsForProviderTable(providerID);
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void LoadProductsForProviderTable(int providerID) {
+        List<PrecioProveedorProducto> productos = this.productosService.getProductsByProvider(providerID);
+        LimpiarTable((DefaultTableModel) TableProvidersProducts.getModel());
+        List<Object[]> objToAdd = new ArrayList();
+
+        productos.forEach(prod -> objToAdd.add(
+            new Object[]{
+                prod.getProducto().getId(),
+                prod.getProducto().getPublicSalePrice(),
+                prod.getPrecioCompra(),
+                prod.getProducto().getTitle(),
+                prod.getProducto().getCode()
+            }
+        ));
+
+        DefaultTableModel modeloPP = (DefaultTableModel) TableProvidersProducts.getModel();
+
+        objToAdd.forEach(obj -> modeloPP.addRow(obj));
+
+        TableProvidersProducts.setModel(modeloPP);
+    }
+    
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         
-        // TODO: Tomar los productos que estan seleccionados de la lista
-        // TODO: Agregar textfield para filtrar la lista de productos
-        // TODO: Agregar boton para cerrar ventana
         // TODO: Hacer reload de la tabla de productos en el proveedor
+
+        String taxPayerID = modalProviderLinkIDLabel.getText().split(" ")[1];
+        int providerID = Integer.parseInt(modalProviderLinkIDLabel.getText().split(" ")[0]);
+        
+//        Provider providerFound = this.productosService.getProviderByTaxPayerID(taxPayerID);
         
         List<String> selectedProducts = providerLinkedProductsList.getSelectedValuesList();
-        
+
         for (String selectedProduct: selectedProducts) {
-            String[] splitted = selectedProduct.split(" ");
+            String cleanedProductCode = selectedProduct
+                    .replaceAll("<[^>]*>", "")
+                    .replaceAll(".*Codigo:", "")
+                    .strip();
+            
+            // TODO: Para cada producto solicitar el precio
+            // usar String userInput = JOptionPane.showInputDialog("Enter your name:");
+            
             try{
-                Product productFound = this.productosService.searchByCodigo(splitted[0]);
+                Product productFound = this.productosService.searchByCodigo(cleanedProductCode);
                 Provider providerFound = this.productosService.getProviderByID(providerID);
 
                 PrecioProveedorProducto pppFound = this.productosService.getPrecioProveedorProducto(providerID, productFound.getId());
 
                 if (pppFound == null) {
-
+                    
+                    this.productosService.addPrecioProveedorProducto(
+                        new PrecioProveedorProducto.PrecioProveedorProductoId(productFound.getId(), providerFound.getId()),
+                        0.0 // TODO: Tomar el precio que ingrese el usuario para cada producto
+                    );
+                    
+                    JOptionPane.showMessageDialog(
+                        modalProviderLinkProductos,
+                        "Producto " +
+                        cleanedProductCode +
+                        " vinculado al proveedor " +
+                        taxPayerID
+                    );
+                    
+                    
                 } else {
                     JOptionPane.showMessageDialog(modalProviderLinkProductos, "El producto ya se encuentra vinculado al proveedor");
                 }
@@ -2810,41 +2921,19 @@ public class Sistema extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(null, ex.getMessage());
             }
         }
-        
-        
+        modalProviderLinkProductsFrame.setVisible(false);
+        LoadProductsForProviderTable(providerID);
+
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void productToLinkTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_productToLinkTextFieldActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_productToLinkTextFieldActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         // TODO add your handling code here:
-        modalProviderLinkProductsFrame.setVisible(false);
-        
-        int providerID = Integer.parseInt(modalProviderLinkIDLabel.getText());
-        List<PrecioProveedorProducto> productos = this.productosService.getProductsByProvider(providerID);
-        
-        LimpiarTable((DefaultTableModel) TableProvidersProducts.getModel());
-        List<Object[]> objToAdd = new ArrayList();
-        
-        productos.forEach(prod -> objToAdd.add(
-            new Object[]{
-                prod.getProducto().getId(),
-                prod.getProducto().getPublicSalePrice(),
-                prod.getPrecioCompra(),
-                prod.getProducto().getTitle(),
-                prod.getProducto().getCode()
-            }    
-        ));
-        
-
-        DefaultTableModel modeloPP = (DefaultTableModel) TableProvidersProducts.getModel();
-        
-        objToAdd.forEach(obj -> modeloPP.addRow(obj));
-        
-        TableProvidersProducts.setModel(modeloPP);
-    }//GEN-LAST:event_jButton2ActionPerformed
+        providerLinkedProductsList.clearSelection();
+    }//GEN-LAST:event_jButton3ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -2914,6 +3003,7 @@ public class Sistema extends javax.swing.JFrame {
     private java.awt.Checkbox checkboxAplicaIva;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
     public javax.swing.JComboBox<String> jComboCat;
     private javax.swing.JFrame jFrame1;
     private javax.swing.JLabel jLabel1;

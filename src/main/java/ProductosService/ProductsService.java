@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import Persistence.Store;
+import ProductosService.PrecioProveedorProducto.PrecioProveedorProductoId;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.AbstractMap;
@@ -157,14 +158,60 @@ public class ProductsService {
         }
     }
     
+    public List<Product> getProductsNotLinkedToProvider(String taxPayerID) {
+        Session session = null;
+        
+        try {
+            session = this.store.createSession(); 
+            session.beginTransaction();
+            
+//            String hql = (
+//                "SELECT p FROM Product p " +
+//                "LEFT JOIN p.preciosPorProveedor ppp " +
+//                "WHERE ppp.proveedor.taxPayerId = :taxPayerID AND p.id NOT IN (" +
+//                "SELECT ppp2.producto.id FROM PrecioProveedorProducto ppp2 " +
+//                "WHERE ppp2.proveedor.taxPayerId = :taxPayerID" +
+//                ")"
+//            );
+            
+//            String hql2 = "SELECT p FROM Product p " +
+//                          "WHERE p.id NOT IN (SELECT ppp.producto.id FROM PrecioProveedorProducto ppp WHERE ppp.proveedor.id = :proveedorId)";
+            String hql = "SELECT p FROM Product p " +
+                         "LEFT JOIN p.preciosPorProveedor ppp " +
+                         "WHERE (ppp.id IS NULL) " + // Condición 1: no tiene NINGÚN proveedor asociado (sin entradas en ppp)
+                         "OR (" +
+                         "    p.id NOT IN (SELECT ppp_sub.producto.id FROM PrecioProveedorProducto ppp_sub WHERE ppp_sub.proveedor.taxPayerId = :taxPayerID)" +
+                         ")";
+    
+
+            List<Product> products = session
+                    .createQuery(hql, Product.class)
+                    .setParameter("taxPayerID", taxPayerID)
+                    .getResultList();
+            
+            return products;
+        } catch (Exception ex) {
+            if (session != null && session.getTransaction().isActive()) {
+                session.getTransaction().rollback(); // Rollback en caso de error
+            }
+            System.err.println("Error al buscar entidad por ID: " + ex.getMessage()); // Usa System.err para errores
+            return null;
+        } finally {
+            if (session != null && session.isOpen()) {
+                session.close(); // Cierra la sesión
+            }
+        } 
+    }
+    
     public Provider getProviderByTaxPayerID(String taxPayerID) {
         Session session = null;
         
         try {
             session = this.store.createSession(); 
             session.beginTransaction();
+            
             Provider provider = session
-                    .createQuery("FROM Provider WHERE taxPayerId = :taxPayerID", Provider.class)
+                    .createQuery("SELECT p FROM Provider p WHERE p.taxPayerId = :taxPayerID", Provider.class)
                     .setParameter("taxPayerID", taxPayerID)
                     .getSingleResult();
             return provider;
@@ -174,6 +221,46 @@ public class ProductsService {
             }
             System.err.println("Error al buscar entidad por ID: " + ex.getMessage()); // Usa System.err para errores
             return null;
+        } finally {
+            if (session != null && session.isOpen()) {
+                session.close(); // Cierra la sesión
+            }
+        }       
+    }
+    
+    public void addPrecioProveedorProducto(PrecioProveedorProductoId compoundKey, double precio) {
+        Session session = null;
+        
+        try {
+            session = this.store.createSession(); 
+            session.beginTransaction();
+            
+            // Get managed entities
+            Product product = session.find(Product.class, compoundKey.getProductoId());
+            Provider provider = session.find(Provider.class, compoundKey.getProveedorId());
+            
+            PrecioProveedorProducto newPpp = new PrecioProveedorProducto();
+            newPpp.setId(compoundKey);
+            newPpp.setPrecioCompra(precio);
+            newPpp.setProducto(product);
+            newPpp.setProveedor(provider);
+            
+            session.persist(newPpp);
+            
+            product.agregarPrecioProveedor(newPpp);
+            provider.agregarPrecioProducto(newPpp);
+            
+            session.merge(product);
+            session.merge(provider);
+            
+            session.getTransaction().commit(); 
+            
+        } catch (Exception ex) {
+            if (session != null && session.getTransaction().isActive()) {
+                session.getTransaction().rollback(); // Rollback en caso de error
+            }
+            System.err.println("Error al buscar entidad por ID: " + ex.getMessage()); // Usa System.err para errores
+            
         } finally {
             if (session != null && session.isOpen()) {
                 session.close(); // Cierra la sesión
@@ -192,6 +279,11 @@ public class ProductsService {
                     .setParameter("proveedorId", providerID)
                     .getResultList();
             return products;
+        } catch (Exception ex) {
+//            if (session != null && session.getTransaction().isActive()) {
+//                session.getTransaction().rollback(); // Rollback en caso de error
+//            }
+            return null;
         } finally {
 //            if (session != null && session.isOpen()) {
 //                session.close(); // Cierra la sesión
