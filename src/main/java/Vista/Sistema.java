@@ -55,15 +55,21 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.Vector;
 import java.util.regex.PatternSyntaxException;
+import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JTable;
 import javax.swing.ListModel;
 import javax.swing.RowFilter;
 import javax.swing.Timer;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import org.hibernate.Session;
@@ -104,6 +110,7 @@ public class Sistema extends javax.swing.JFrame {
     JFrame modalUpdateFrame = new JFrame();
     JFrame modalProviderFrame = new JFrame();
     JFrame modalProviderLinkProductsFrame = new JFrame();
+    JFrame modalProviderLinkProductsFramePCP = new JFrame();
     JDialog modalDialog;
     Sale tmpVenta = new Sale();
 
@@ -587,6 +594,12 @@ public class Sistema extends javax.swing.JFrame {
         jLabel30 = new javax.swing.JLabel();
         jLabel31 = new javax.swing.JLabel();
         jButton3 = new javax.swing.JButton();
+        modalProviderLinkProductosPCP = new javax.swing.JPanel();
+        jScrollPane9 = new javax.swing.JScrollPane();
+        productosPCPTable = new javax.swing.JTable();
+        jButton4 = new javax.swing.JButton();
+        jLabel32 = new javax.swing.JLabel();
+        providerIDPCP = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         menuVentasBtn = new javax.swing.JButton();
         menuProductosBtn = new javax.swing.JButton();
@@ -1277,6 +1290,69 @@ public class Sistema extends javax.swing.JFrame {
                 .addContainerGap(31, Short.MAX_VALUE))
         );
 
+        productosPCPTable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null},
+                {null, null, null},
+                {null, null, null},
+                {null, null, null}
+            },
+            new String [] {
+                "CODIGO", "TITULO", "PCP*"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, true
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane9.setViewportView(productosPCPTable);
+
+        jButton4.setText("Confirmar");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
+
+        jLabel32.setText("(*) Precio de compra a proveedor");
+
+        providerIDPCP.setText("    ");
+
+        javax.swing.GroupLayout modalProviderLinkProductosPCPLayout = new javax.swing.GroupLayout(modalProviderLinkProductosPCP);
+        modalProviderLinkProductosPCP.setLayout(modalProviderLinkProductosPCPLayout);
+        modalProviderLinkProductosPCPLayout.setHorizontalGroup(
+            modalProviderLinkProductosPCPLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(modalProviderLinkProductosPCPLayout.createSequentialGroup()
+                .addGap(41, 41, 41)
+                .addGroup(modalProviderLinkProductosPCPLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(modalProviderLinkProductosPCPLayout.createSequentialGroup()
+                        .addComponent(jLabel32)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(providerIDPCP))
+                    .addComponent(jScrollPane9, javax.swing.GroupLayout.DEFAULT_SIZE, 427, Short.MAX_VALUE)
+                    .addComponent(jButton4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(39, Short.MAX_VALUE))
+        );
+        modalProviderLinkProductosPCPLayout.setVerticalGroup(
+            modalProviderLinkProductosPCPLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(modalProviderLinkProductosPCPLayout.createSequentialGroup()
+                .addGap(29, 29, 29)
+                .addComponent(jScrollPane9, javax.swing.GroupLayout.PREFERRED_SIZE, 299, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jButton4)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(modalProviderLinkProductosPCPLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel32)
+                    .addComponent(providerIDPCP))
+                .addContainerGap(13, Short.MAX_VALUE))
+        );
+
+        providerIDPCP.setVisible(false);
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
@@ -1335,7 +1411,7 @@ public class Sistema extends javax.swing.JFrame {
                 .addComponent(menuProductosBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(menuProveedoresBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(333, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         getContentPane().add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 150, 720));
@@ -2835,9 +2911,11 @@ public class Sistema extends javax.swing.JFrame {
         }
         
         // Mostrar modal para linkear productos
-        modalProviderLinkProductsFrame.getContentPane().add(modalProviderLinkProductos);
-        modalProviderLinkProductsFrame.pack();
-        initializeModal(modalProviderLinkProductsFrame);
+//        modalProviderLinkProductsFrame.getContentPane().add(modalProviderLinkProductos);
+//        modalProviderLinkProductsFrame.pack();
+//        initializeModal(modalProviderLinkProductsFrame);
+        
+        initializeModalWithPanel(modalProviderLinkProductsFrame, modalProviderLinkProductos, true);
         
     }//GEN-LAST:event_vincularProductosButtonActionPerformed
 
@@ -2849,6 +2927,15 @@ public class Sistema extends javax.swing.JFrame {
         LoadProductsForProviderTable(providerID);
     }//GEN-LAST:event_jButton2ActionPerformed
 
+    private void initializeModalWithPanel(JFrame frame, JPanel panel, boolean allowClose) {
+        frame.getContentPane().add(panel);
+        frame.pack();
+        initializeModal(frame);
+        
+        if (allowClose) frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        
+    }
+    
     private void LoadProductsForProviderTable(int providerID) {
         List<PrecioProveedorProducto> productos = this.productosService.getProductsByProvider(providerID);
         LimpiarTable((DefaultTableModel) TableProvidersProducts.getModel());
@@ -2882,47 +2969,84 @@ public class Sistema extends javax.swing.JFrame {
         
         List<String> selectedProducts = providerLinkedProductsList.getSelectedValuesList();
 
+        if (selectedProducts.size() == 0) {
+            JOptionPane.showMessageDialog(modalProviderLinkProductos, "No hay ningun producto seleccionado");
+            return;
+        }
+        
+        // ACA CONFIRMAR LOS PCP PARA CADA PROD
+        initializeModalWithPanel(modalProviderLinkProductsFramePCP, modalProviderLinkProductosPCP, true);
+//        productosPCPTable
+        
+        List<Object[]> pcpProducts = new ArrayList();
+        
         for (String selectedProduct: selectedProducts) {
             String cleanedProductCode = selectedProduct
-                    .replaceAll("<[^>]*>", "")
+                    .replaceAll("<[^>]*>", "") // remove html tags
                     .replaceAll(".*Codigo:", "")
                     .strip();
+            String cleanedProductTitle = selectedProduct
+                    .replaceAll("<[^>]*>", "") // remove html tags
+                    .replaceAll("\n*Codigo:.*", "")
+                    .strip();
             
-            // TODO: Para cada producto solicitar el precio
-            // usar String userInput = JOptionPane.showInputDialog("Enter your name:");
-            
-            try{
-                Product productFound = this.productosService.searchByCodigo(cleanedProductCode);
-                Provider providerFound = this.productosService.getProviderByID(providerID);
-
-                PrecioProveedorProducto pppFound = this.productosService.getPrecioProveedorProducto(providerID, productFound.getId());
-
-                if (pppFound == null) {
-                    
-                    this.productosService.addPrecioProveedorProducto(
-                        new PrecioProveedorProducto.PrecioProveedorProductoId(productFound.getId(), providerFound.getId()),
-                        0.0 // TODO: Tomar el precio que ingrese el usuario para cada producto
-                    );
-                    
-                    JOptionPane.showMessageDialog(
-                        modalProviderLinkProductos,
-                        "Producto " +
-                        cleanedProductCode +
-                        " vinculado al proveedor " +
-                        taxPayerID
-                    );
-                    
-                    
-                } else {
-                    JOptionPane.showMessageDialog(modalProviderLinkProductos, "El producto ya se encuentra vinculado al proveedor");
-                }
-
-            } catch(Exception ex) {
-                JOptionPane.showMessageDialog(null, ex.getMessage());
-            }
+            pcpProducts.add(new Object[] {
+                cleanedProductCode,
+                cleanedProductTitle,
+                ""
+            });
         }
-        modalProviderLinkProductsFrame.setVisible(false);
-        LoadProductsForProviderTable(providerID);
+
+        
+        DefaultTableModel modeloPCP = (DefaultTableModel) productosPCPTable.getModel();
+        LimpiarTable((DefaultTableModel) modeloPCP);
+        pcpProducts.forEach(obj -> modeloPCP.addRow(obj));
+        productosPCPTable.setModel(modeloPCP);
+        
+        providerIDPCP.setText(providerID + "");
+        ///////////////////////////////////////
+        
+//        for (String selectedProduct: selectedProducts) {
+//            String cleanedProductCode = selectedProduct
+//                    .replaceAll("<[^>]*>", "")
+//                    .replaceAll(".*Codigo:", "")
+//                    .strip();
+//            
+//            // TODO: Para cada producto solicitar el precio
+////            String userInput = JOptionPane.showInputDialog("Precio de compra para " +  + ":");
+//            
+//            try{
+//                Product productFound = this.productosService.searchByCodigo(cleanedProductCode);
+//                Provider providerFound = this.productosService.getProviderByID(providerID);
+//
+//                PrecioProveedorProducto pppFound = this.productosService.getPrecioProveedorProducto(providerID, productFound.getId());
+//
+//                if (pppFound == null) {
+//                    
+//                    this.productosService.addPrecioProveedorProducto(
+//                        new PrecioProveedorProducto.PrecioProveedorProductoId(productFound.getId(), providerFound.getId()),
+//                        0.0 // TODO: Tomar el precio que ingrese el usuario para cada producto
+//                    );
+//                    
+//                    JOptionPane.showMessageDialog(
+//                        modalProviderLinkProductos,
+//                        "Producto " +
+//                        cleanedProductCode +
+//                        " vinculado al proveedor " +
+//                        taxPayerID
+//                    );
+//                    
+//                    
+//                } else {
+//                    JOptionPane.showMessageDialog(modalProviderLinkProductos, "El producto ya se encuentra vinculado al proveedor");
+//                }
+//
+//            } catch(Exception ex) {
+//                JOptionPane.showMessageDialog(null, ex.getMessage());
+//            }
+//        }
+//        modalProviderLinkProductsFrame.setVisible(false);
+//        LoadProductsForProviderTable(providerID);
 
     }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -2934,6 +3058,45 @@ public class Sistema extends javax.swing.JFrame {
         // TODO add your handling code here:
         providerLinkedProductsList.clearSelection();
     }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        // TODO add your handling code here:
+        productosPCPTable.getCellEditor().stopCellEditing();
+//        TableColumn codigoColumn = productosPCPTable..getColumn("CODIGO");
+//        TableColumn pcpColumn = productosPCPTable.getColumn("PCP*");
+        
+        int rows = productosPCPTable.getRowCount();
+        // Funciona porque cada vez que se apreta el boton se instancia otro TableErrorRenderer
+        TableErrorRenderer errorRenderer = new TableErrorRenderer(rows);
+        
+        productosPCPTable.getColumnModel()
+                .getColumn(2)
+                .setCellRenderer(errorRenderer);
+
+        
+        // Check all PCPs
+        for (int i = 0; i<rows; i++){
+            String value = productosPCPTable.getValueAt(i, 2).toString();
+            try {
+                double parsedPrice = Double.parseDouble(value);
+                // TODO: Setear flag para indicar error
+                System.out.println(parsedPrice);
+            } catch (Exception ex) {
+                errorRenderer.addErrorToRow(i);
+            }
+            
+        }
+        
+        // TODO: si no hubo ningun error entonces persistir precios
+        
+        if (productosPCPTable.getCellEditor() != null)
+            productosPCPTable.getCellEditor().stopCellEditing();
+        
+        productosPCPTable.clearSelection();
+        productosPCPTable.repaint();
+        
+        //pcpColumn.
+    }//GEN-LAST:event_jButton4ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -3004,6 +3167,7 @@ public class Sistema extends javax.swing.JFrame {
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
     public javax.swing.JComboBox<String> jComboCat;
     private javax.swing.JFrame jFrame1;
     private javax.swing.JLabel jLabel1;
@@ -3031,6 +3195,7 @@ public class Sistema extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel30;
     private javax.swing.JLabel jLabel31;
+    private javax.swing.JLabel jLabel32;
     private javax.swing.JLabel jLabel33;
     private javax.swing.JLabel jLabel34;
     private javax.swing.JLabel jLabel35;
@@ -3053,6 +3218,7 @@ public class Sistema extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JScrollPane jScrollPane7;
     private javax.swing.JScrollPane jScrollPane8;
+    private javax.swing.JScrollPane jScrollPane9;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTextField jtxtFiltro;
     private javax.swing.JLabel labelUpdateID;
@@ -3065,6 +3231,7 @@ public class Sistema extends javax.swing.JFrame {
     private javax.swing.JPanel modalProvider;
     private javax.swing.JLabel modalProviderLinkIDLabel;
     private javax.swing.JPanel modalProviderLinkProductos;
+    private javax.swing.JPanel modalProviderLinkProductosPCP;
     private javax.swing.JPanel modalUpdate;
     private javax.swing.JPanel nuevaVentaPanel;
     private javax.swing.JLabel paymentCashErrorLabel;
@@ -3074,8 +3241,10 @@ public class Sistema extends javax.swing.JFrame {
     private javax.swing.JTabbedPane principalPanel;
     private javax.swing.JTable productProveedoresTable;
     private javax.swing.JTextField productToLinkTextField;
+    private javax.swing.JTable productosPCPTable;
     private javax.swing.JLabel productsErrorDisplay;
     private javax.swing.JPanel proveedoresPanel;
+    private javax.swing.JLabel providerIDPCP;
     private javax.swing.JList<String> providerLinkedProductsList;
     private javax.swing.JTextField providerNombre;
     private javax.swing.JTextField providerTaxPayerID;
