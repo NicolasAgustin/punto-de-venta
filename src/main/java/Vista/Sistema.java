@@ -25,6 +25,7 @@ import ProductosService.Product;
 import ProductosService.ProductsService;
 import ProductosService.ProductosValidacion;
 import ProductosService.Provider;
+import Utils.Pair;
 import VentasService.Detail;
 //import VentasService.ProductoDetalle;
 import VentasService.Sale;
@@ -3064,15 +3065,19 @@ public class Sistema extends javax.swing.JFrame {
         productosPCPTable.getCellEditor().stopCellEditing();
 //        TableColumn codigoColumn = productosPCPTable..getColumn("CODIGO");
 //        TableColumn pcpColumn = productosPCPTable.getColumn("PCP*");
-        
+        int providerID = Integer.parseInt(providerIDPCP.getText());
+
         int rows = productosPCPTable.getRowCount();
         // Funciona porque cada vez que se apreta el boton se instancia otro TableErrorRenderer
         TableErrorRenderer errorRenderer = new TableErrorRenderer(rows);
+        
+        boolean errorFlag = false;
         
         productosPCPTable.getColumnModel()
                 .getColumn(2)
                 .setCellRenderer(errorRenderer);
 
+        List<Pair<String, Double>> toPersist = new ArrayList();
         
         // Check all PCPs
         for (int i = 0; i<rows; i++){
@@ -3080,22 +3085,75 @@ public class Sistema extends javax.swing.JFrame {
             try {
                 double parsedPrice = Double.parseDouble(value);
                 // TODO: Setear flag para indicar error
+                toPersist.add(
+                    new Pair(productosPCPTable.getValueAt(i, 0).toString(), parsedPrice)
+                );
+                
                 System.out.println(parsedPrice);
             } catch (Exception ex) {
                 errorRenderer.addErrorToRow(i);
+                errorFlag = true;
             }
-            
         }
         
         // TODO: si no hubo ningun error entonces persistir precios
         
-        if (productosPCPTable.getCellEditor() != null)
-            productosPCPTable.getCellEditor().stopCellEditing();
+        if (!errorFlag) {
+            
+            // Para permitir modificar la lista en pleno bucle
+            int itemsOk = 0;
+            for (int i = 0;i < toPersist.size();i++){
+                
+                Pair<String, Double> item = toPersist.get(i);
+                
+                try {
+                    
+                    Product productFound = this.productosService.searchByCodigo(item.a);
+                    Provider providerFound = this.productosService.getProviderByID(providerID);
+
+                    PrecioProveedorProducto pppFound = this.productosService.getPrecioProveedorProducto(providerID, productFound.getId());
+
+                    if (pppFound == null) {
+
+                        this.productosService.addPrecioProveedorProducto(
+                            new PrecioProveedorProducto.PrecioProveedorProductoId(productFound.getId(), providerFound.getId()),
+                            item.b // TODO: Tomar el precio que ingrese el usuario para cada producto
+                        );
+
+                        JOptionPane.showMessageDialog(
+                            modalProviderLinkProductos,
+                            "Producto " +
+                            item.a +
+                            " vinculado al proveedor " +
+                            providerFound.getTaxPayerId()
+                        );
+
+                        itemsOk += 1;
+                    }
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(null, ex.getMessage());
+                }
+            }
+            
+            if (toPersist.size() == itemsOk){
+                modalProviderLinkProductsFramePCP.setVisible(false);
+                modalProviderLinkProductsFrame.setVisible(false);
+                LoadProductsForProviderTable(providerID);
+                return;
+            } else {
+                // Handle error
+            }
+                
+        } else {
         
-        productosPCPTable.clearSelection();
-        productosPCPTable.repaint();
+            if (productosPCPTable.getCellEditor() != null)
+                productosPCPTable.getCellEditor().stopCellEditing();
+
+            productosPCPTable.clearSelection();
+            productosPCPTable.repaint();
         
-        //pcpColumn.
+        }
+        
     }//GEN-LAST:event_jButton4ActionPerformed
 
     /**
