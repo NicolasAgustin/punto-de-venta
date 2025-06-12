@@ -584,6 +584,8 @@ public class Sistema extends javax.swing.JFrame {
         providerNombre = new javax.swing.JTextField();
         providerTaxPayerID = new javax.swing.JTextField();
         vincularProductosButton = new javax.swing.JButton();
+        jLabel36 = new javax.swing.JLabel();
+        jLabel37 = new javax.swing.JLabel();
         modalProviderLinkProductos = new javax.swing.JPanel();
         modalProviderLinkIDLabel = new javax.swing.JLabel();
         jScrollPane8 = new javax.swing.JScrollPane();
@@ -1159,26 +1161,33 @@ public class Sistema extends javax.swing.JFrame {
             }
         });
 
+        jLabel36.setText("(PDV) Precio de venta");
+
+        jLabel37.setText("(PCP) Precio de compra a proveedor");
+
         javax.swing.GroupLayout modalProviderLayout = new javax.swing.GroupLayout(modalProvider);
         modalProvider.setLayout(modalProviderLayout);
         modalProviderLayout.setHorizontalGroup(
             modalProviderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(modalProviderLayout.createSequentialGroup()
                 .addGap(27, 27, 27)
-                .addGroup(modalProviderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(modalProviderLayout.createSequentialGroup()
-                        .addGroup(modalProviderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(modalProviderLayout.createSequentialGroup()
-                                .addComponent(jLabel29)
-                                .addGap(46, 46, 46)
-                                .addComponent(providerTaxPayerID, javax.swing.GroupLayout.DEFAULT_SIZE, 328, Short.MAX_VALUE))
-                            .addGroup(modalProviderLayout.createSequentialGroup()
-                                .addComponent(jLabel28)
-                                .addGap(18, 18, 18)
-                                .addComponent(providerNombre)))
-                        .addGap(18, 18, 18)
-                        .addComponent(vincularProductosButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addComponent(jScrollPane7, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 641, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(modalProviderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel37)
+                    .addComponent(jLabel36)
+                    .addGroup(modalProviderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addGroup(modalProviderLayout.createSequentialGroup()
+                            .addGroup(modalProviderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addGroup(modalProviderLayout.createSequentialGroup()
+                                    .addComponent(jLabel29)
+                                    .addGap(46, 46, 46)
+                                    .addComponent(providerTaxPayerID, javax.swing.GroupLayout.DEFAULT_SIZE, 328, Short.MAX_VALUE))
+                                .addGroup(modalProviderLayout.createSequentialGroup()
+                                    .addComponent(jLabel28)
+                                    .addGap(18, 18, 18)
+                                    .addComponent(providerNombre)))
+                            .addGap(18, 18, 18)
+                            .addComponent(vincularProductosButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(jScrollPane7, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 641, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(27, Short.MAX_VALUE))
         );
         modalProviderLayout.setVerticalGroup(
@@ -1196,7 +1205,11 @@ public class Sistema extends javax.swing.JFrame {
                         .addComponent(vincularProductosButton)))
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(41, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel36)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel37)
+                .addContainerGap())
         );
 
         modalProviderLinkIDLabel.setText("jLabel8");
@@ -2090,6 +2103,9 @@ public class Sistema extends javax.swing.JFrame {
 
         // Cuando agregamos dos veces el mismo producto deberiamos agrupar las dos entradas
         // en lugar de que aparezcan repetidos
+        
+        // TODO: Arreglar precios cuando se carga un producto a un pedido
+        
         int cantidad;
         String codigoBarras = txtCodigoProducto.getText();
 
@@ -2174,7 +2190,7 @@ public class Sistema extends javax.swing.JFrame {
                     return;
                 }
 
-                float diff = pago - tmpVenta.getTotal();
+                double diff = pago - tmpVenta.getTotal();
 
                 if (diff < 0) {
                     paymentCashPago.setBorder(new LineBorder(Color.RED, 2));
@@ -2617,6 +2633,7 @@ public class Sistema extends javax.swing.JFrame {
         
         List<PrecioProveedorProducto> providersProducts = this.productosService.getProvidersByProduct(Integer.parseInt(ID));
         
+        // TODO: Fix providers no session
         for (PrecioProveedorProducto ppp: providersProducts) {
             modelProveedores.addRow(
                 new Object[]{
@@ -3257,6 +3274,8 @@ public class Sistema extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel33;
     private javax.swing.JLabel jLabel34;
     private javax.swing.JLabel jLabel35;
+    private javax.swing.JLabel jLabel36;
+    private javax.swing.JLabel jLabel37;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;

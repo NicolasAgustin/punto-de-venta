@@ -19,7 +19,7 @@ public class PaymentInformation {
     private long timestamp;
     
     private String currency;
-    private float amount;
+    private double amount;
 
     public long getTimestamp() {
         return timestamp;
@@ -37,7 +37,7 @@ public class PaymentInformation {
         this.currency = currency;
     }
 
-    public float getAmount() {
+    public double getAmount() {
         return amount;
     }
 

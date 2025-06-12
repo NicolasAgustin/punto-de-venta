@@ -33,7 +33,7 @@ public class VentasService {
     
     private BillerConnector billerConnector = new BillerConnector();
     
-    public static final float IVA_PERCENTAGE = 21;
+    public static final double IVA_PERCENTAGE = 21;
     
     // Agregar logica de negocio y validacion de informacion
     
@@ -51,13 +51,13 @@ public class VentasService {
             throw new ValidationException("El monto no puede ser negativo.");
     }
     
-    private float calculateIva(float amount) {
-        return amount * (float) (IVA_PERCENTAGE / 100.0);
+    private double calculateIva(double amount) {
+        return amount * (double)(IVA_PERCENTAGE / 100.0);
     }
     
     public Detail createDetalle(Product found, int cantidad) {
-        float subtotal = found.getUnitaryPrice() * cantidad;
-        float total = subtotal + this.calculateIva(subtotal);
+        double subtotal = found.getPublicSalePrice() * cantidad;
+        double total = subtotal + this.calculateIva(subtotal);
         return new Detail(found, cantidad, 0, subtotal, IVA_PERCENTAGE, total);
     }
     
@@ -99,11 +99,11 @@ public class VentasService {
                     pDetalle.setCantidad(pDetalle.getQuantity() - 1);
                     
                     // Must re calculate total and subtotal
-                    float pricePerItemToRemove = pDetalle.getProducto().getUnitaryPrice() + 
+                    double pricePerItemToRemove = pDetalle.getProducto().getUnitaryPrice() + 
                             this.calculateIva(pDetalle.getProducto().getUnitaryPrice());
-                    float newTotal = (pDetalle.getTotal() - pricePerItemToRemove);
+                    double newTotal = (pDetalle.getTotal() - pricePerItemToRemove);
                     
-                    float newSubtotal = pDetalle.getSubtotal() - pDetalle.getProducto().getUnitaryPrice();
+                    double newSubtotal = pDetalle.getSubtotal() - pDetalle.getProducto().getUnitaryPrice();
                     
                     pDetalle.setSubtotal(newSubtotal);
                     pDetalle.setTotal(newTotal);

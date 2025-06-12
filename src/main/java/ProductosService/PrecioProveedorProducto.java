@@ -11,12 +11,12 @@ public class PrecioProveedorProducto {
     @EmbeddedId // Usamos @EmbeddedId para la clave primaria compuesta
     private PrecioProveedorProductoId id;
 
-    @ManyToOne(fetch = FetchType.LAZY) // Relación con Producto
+    @ManyToOne(fetch = FetchType.EAGER) // Relación con Producto
     @MapsId("productoId") // Mapea el ID de Producto a la propiedad 'productoId' en el ID embebido
     @JoinColumn(name = "producto_id") // Columna de la clave foránea
     private Product producto;
 
-    @ManyToOne(fetch = FetchType.LAZY) // Relación con Proveedor
+    @ManyToOne(fetch = FetchType.EAGER) // Relación con Proveedor
     @MapsId("proveedorId") // Mapea el ID de Proveedor a la propiedad 'proveedorId' en el ID embebido
     @JoinColumn(name = "proveedor_id") // Columna de la clave foránea
     private Provider proveedor;

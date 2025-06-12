@@ -38,7 +38,7 @@ public class Sale implements BaseTableModel {
     private Long id;
     
     @Column(name="total")
-    private float total = 0;
+    private double total = 0;
     
     @Column(name="invoice_number")
     private String invoice_number;
@@ -133,11 +133,11 @@ public class Sale implements BaseTableModel {
         return id;
     }
 
-    public void setTotal(float total){
+    public void setTotal(double total){
         this.total = total;
     }
     
-    public float getTotal() {
+    public double getTotal() {
         return this.total;
     }
     

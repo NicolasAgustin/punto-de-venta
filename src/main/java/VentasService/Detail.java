@@ -45,15 +45,15 @@ public class Detail {
     private int discount;
     
     @Column(name = "subtotal")
-    private float subtotal;
+    private double subtotal;
     
     @Column(name = "iva")
-    private float iva;
+    private double iva;
     
     @Column(name = "total")
-    private float total;
+    private double total;
 
-    public Detail(Product prod, int quantity, int discount, float subtotal, float iva, float total) {
+    public Detail(Product prod, int quantity, int discount, double subtotal, double iva, double total) {
         this.product = prod;
         this.quantity = quantity;
         this.discount = discount;
@@ -97,7 +97,7 @@ public class Detail {
             this.product.getCode(),
             this.product.getTitle(),
             this.quantity,
-            this.product.getUnitaryPrice(),
+            this.product.getPublicSalePrice(),
             this.discount,
             this.subtotal,
             this.iva,
@@ -136,15 +136,15 @@ public class Detail {
         this.discount = discount;
     }
 
-    public float getSubtotal() {
+    public double getSubtotal() {
         return this.subtotal;
     }
 
-    public void setSubtotal(float subtotal) {
+    public void setSubtotal(double subtotal) {
         this.subtotal = subtotal;
     }
 
-    public float getIva() {
+    public double getIva() {
         return iva;
     }
 
@@ -152,18 +152,19 @@ public class Detail {
         this.iva = iva;
     }
 
-    public float getTotal() {
+    public double getTotal() {
         return this.total;
     }
 
-    public void setTotal(float total) {
+    public void setTotal(double total) {
         this.total = total;
     }
     
     public void add(Detail detail) {
         this.quantity += detail.quantity;
         this.subtotal += detail.subtotal;
-        this.iva += detail.iva;
+        // Is an error to sumarize the amount of iva
+        // this.iva += detail.iva;
         this.total += detail.total;
     }
 }
