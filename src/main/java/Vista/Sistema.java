@@ -2106,13 +2106,24 @@ public class Sistema extends javax.swing.JFrame {
         
         // TODO: Arreglar precios cuando se carga un producto a un pedido
         
-        int cantidad;
+        int cantidad = 0;
         String codigoBarras = txtCodigoProducto.getText();
 
-        if (!txtCantidadVenta.getText().equals("")) {
-            cantidad = Integer.parseInt(txtCantidadVenta.getText());
+        String cantidadVentaValue = txtCantidadVenta
+                .getText();
+//                .replaceAll("\\D", "");
+        
+        if (!cantidadVentaValue.equals("")) {
+            try{
+                cantidad = Integer.parseInt(cantidadVentaValue);
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(null, "Ingrese una cantidad valida");
+                txtCantidadVenta.setText("");
+                return;
+            }
         } else {
             cantidad = 1;
+            txtCantidadVenta.setText("");
         }
 
         try {
@@ -2181,7 +2192,18 @@ public class Sistema extends javax.swing.JFrame {
                 paymentCashErrorLabel.setText("");
                 paymentCashPago.setBorder(new LineBorder(Color.GRAY, 1));
 
-                Float pago = Float.parseFloat(paymentCashPago.getText());
+                String filteredPaymentCashValue = paymentCashPago.getText().replaceAll("\\D", "");
+                
+                if (filteredPaymentCashValue.equals("")){
+                    paymentCashErrorLabel.setForeground(Color.RED);
+                    paymentCashErrorLabel.setText("Debe ingresar un valor numerico valido.");
+                    paymentCashPago.setBorder(new LineBorder(Color.RED, 2));
+                    return;
+                }
+                
+                Float pago = Float.parseFloat(
+                    paymentCashPago.getText().replaceAll("\\D", "")
+                );
 
                 if (pago < tmpVenta.getTotal()) {
                     paymentCashErrorLabel.setForeground(Color.RED);
