@@ -17,6 +17,8 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
+import Utils.Utils;
+
 /**
  *
  * @author Nico
@@ -166,5 +168,6 @@ public class Detail {
         // Is an error to sumarize the amount of iva
         // this.iva += detail.iva;
         this.total += detail.total;
+        this.total = Utils.roundDouble(this.total);
     }
 }

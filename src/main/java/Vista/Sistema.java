@@ -15,6 +15,7 @@ import Persistence.HibernateUtil;
 import ProductosService.Category;
 import ProductosService.PrecioProveedorProducto;
 
+import Utils.Utils;
 
 import java.util.List;
 import javax.swing.JOptionPane;
@@ -38,6 +39,10 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import static java.lang.Math.round;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.AbstractMap;
 
@@ -92,6 +97,7 @@ public class Sistema extends javax.swing.JFrame {
     int obligCod = 0;
 
     static int bandera = 0;
+    static DecimalFormat df = new DecimalFormat("#.##");
     DefaultTableModel modelo = new DefaultTableModel();
     //Tabla de productos
 
@@ -1470,8 +1476,9 @@ public class Sistema extends javax.swing.JFrame {
         }
 
         jLabel10.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/money.png"))); // NOI18N
-        jLabel10.setText("Total a pagar");
+        jLabel10.setText("Total a pagar: ");
 
+        LabelTotal.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         LabelTotal.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         LabelTotal.setText("----");
 
@@ -1515,12 +1522,12 @@ public class Sistema extends javax.swing.JFrame {
                             .addGroup(nuevaVentaPanelLayout.createSequentialGroup()
                                 .addComponent(btnSaveSale, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(37, 37, 37)
-                                .addGroup(nuevaVentaPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addGroup(nuevaVentaPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(checkboxAplicaIva, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addGroup(nuevaVentaPanelLayout.createSequentialGroup()
                                         .addComponent(jLabel10)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(checkboxAplicaIva, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addComponent(LabelTotal, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(LabelTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 185, javax.swing.GroupLayout.PREFERRED_SIZE))))
                             .addGroup(nuevaVentaPanelLayout.createSequentialGroup()
                                 .addGroup(nuevaVentaPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(txtCodigoProducto, javax.swing.GroupLayout.PREFERRED_SIZE, 179, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1547,7 +1554,7 @@ public class Sistema extends javax.swing.JFrame {
                         .addGroup(nuevaVentaPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel3)
                             .addComponent(jLabel5))
-                        .addGap(0, 72, Short.MAX_VALUE)
+                        .addGap(0, 0, Short.MAX_VALUE)
                         .addGroup(nuevaVentaPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(txtCantidadVenta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(txtCodigoProducto, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -1563,12 +1570,12 @@ public class Sistema extends javax.swing.JFrame {
                 .addGroup(nuevaVentaPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btnSaveSale, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(nuevaVentaPanelLayout.createSequentialGroup()
-                        .addGroup(nuevaVentaPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(checkboxAplicaIva, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel10))
-                        .addGap(18, 18, 18)
-                        .addComponent(LabelTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(194, 194, 194))
+                        .addGroup(nuevaVentaPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel10)
+                            .addComponent(LabelTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(checkboxAplicaIva, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(216, 216, 216))
         );
 
         principalPanel.addTab("Nueva venta", nuevaVentaPanel);
@@ -2153,9 +2160,9 @@ public class Sistema extends javax.swing.JFrame {
             }
 //            this.AddDetalleProducto(detalle);
             LoadDetalle(this.tmpVenta.getDetail());
-
-            // TODO: No se actualiza el total de la venta cuando se agrupan dos productos iguales
-            LabelTotal.setText(String.valueOf(this.tmpVenta.getTotal()));
+            LabelTotal.setText(
+                String.valueOf(Utils.roundDouble(this.tmpVenta.getTotal()))
+            );
             
             btnSaveSale.setEnabled(true);
 

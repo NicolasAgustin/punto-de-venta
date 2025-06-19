@@ -57,7 +57,7 @@ public class VentasService {
     
     public Detail createDetalle(Product found, int cantidad) {
         double subtotal = found.getPublicSalePrice() * cantidad;
-        double total = subtotal + this.calculateIva(subtotal);
+        double total = Utils.Utils.roundDouble(subtotal + this.calculateIva(subtotal));
         return new Detail(found, cantidad, 0, subtotal, IVA_PERCENTAGE, total);
     }
     
@@ -74,7 +74,7 @@ public class VentasService {
         
         int index = collected.indexOf(toCheck);
         collected.get(index).add(toCheck);
-        currentSale.setTotal(currentSale.getTotal() + toCheck.getTotal());
+        currentSale.setTotal(Utils.Utils.roundDouble(currentSale.getTotal() + toCheck.getTotal()));
         return true;
     }
     

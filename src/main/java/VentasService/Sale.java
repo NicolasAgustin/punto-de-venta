@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import Utils.Utils;
+
 /**
  * 
  * @author Nico
@@ -69,8 +71,10 @@ public class Sale implements BaseTableModel {
     public void addDetail(Detail prod) {
         this.detail.add(prod);
         this.total += prod.getTotal();
+        this.total = Utils.roundDouble(this.total);
     }
     
+    // TODO: IMPLEMENTAR ESTO
 //    public void removeProduct(String codigo) {
 //        int indexToRemove = -1;
 //        boolean flagRemove = false;
