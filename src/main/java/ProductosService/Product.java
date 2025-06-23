@@ -63,16 +63,6 @@ public class Product implements BaseTableModel {
     @Column(name="enabled")
     private boolean enabled;
 
-//    @ManyToMany
-//    @JoinTable(
-//        name = "products_providers",
-//        joinColumns = @JoinColumn(name = "product_id"),
-//        inverseJoinColumns = @JoinColumn(name = "provider_id")
-//    )
-//    private List<Provider> providers;
-    
-    // TODO: Testear esto
-    // - Agregar a pantallas de ABM
     @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private Set<PrecioProveedorProducto> preciosPorProveedor = new HashSet<>();
     

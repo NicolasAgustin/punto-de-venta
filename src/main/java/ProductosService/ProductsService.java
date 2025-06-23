@@ -121,7 +121,7 @@ public class ProductsService {
                         ppp.setId(pppId); 
                         ppp.setProducto(currentProduct); 
                         ppp.setProveedor(provider);
-                        session.persist(ppp); // <-- ¡Línea agregada!
+                        session.persist(ppp);
                         
                         // Añadir a las colecciones del producto y proveedor
                         // Esto ahora añade una instancia ya gestionada.
@@ -136,7 +136,6 @@ public class ProductsService {
                     double roundedPrice = bd.doubleValue();
                     ppp.setPrecioCompra(roundedPrice); // Actualizar el precio (siempre)
 
-                    // TODO: Redondear precio
                     // Actualizar el precio de venta al público del producto
                     //currentProduct.setPublicSalePrice(new BigDecimal(roundedPrice + roundedPrice * 0.10).setScale(2, RoundingMode.HALF_UP).doubleValue());
                 }

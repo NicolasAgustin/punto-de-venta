@@ -8,9 +8,7 @@ import Exceptions.StoreException;
 import Exceptions.ValidationException;
 import Forms.FormError;
 import Forms.NewProductForm;
-import Modelo.Cliente;
-import Modelo.ClienteDAO;
-import Modelo.MockClienteDAO;
+
 import Persistence.HibernateUtil;
 import ProductosService.Category;
 import ProductosService.PrecioProveedorProducto;
@@ -1972,15 +1970,6 @@ public class Sistema extends javax.swing.JFrame {
             cbxCatego.addItem(cat.getDescription());
         }
         
-//        for (Provider prov: productosService.getProviders()) {
-//            cbxProveedorPro.addItem(prov.getDescription() + " " + prov.getTaxPayerId());
-//        }
-        
-        // TODO: Ver flujo de carga de productos contemplando los proveedores y precios x proveedor
-        // cuando agrego un producto, tengo que agregar el producto al proveedor
-        // y tomar el valor que se ingreso, sumarle 10%
-        // con esto hay que modificar el metodo providersIngest para que el calculo del precio se haga en base al precio que tiene inicialmente el producto
-        
         LoadProductos();
     }//GEN-LAST:event_menuProductosBtnActionPerformed
 
@@ -2111,7 +2100,6 @@ public class Sistema extends javax.swing.JFrame {
         // Cuando agregamos dos veces el mismo producto deberiamos agrupar las dos entradas
         // en lugar de que aparezcan repetidos
         
-        // TODO: Arreglar precios cuando se carga un producto a un pedido
         
         int cantidad = 0;
         String codigoBarras = txtCodigoProducto.getText();
@@ -2347,11 +2335,8 @@ public class Sistema extends javax.swing.JFrame {
 
     //BOTON ACEPTAR
     private void btnAceptarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAceptarActionPerformed
-   
-      // TODO add your handling code here:
-
-        // TODO: Arreglar colores de los inputs en modalUpdate
-          // Eliminar el borde rojo de todos los campos de entrada
+        
+        // Eliminar el borde rojo de todos los campos de entrada
       
         PrecioUni.setBorder(new LineBorder(new Color(245, 245, 245), 2));
         CantInici.setBorder(new LineBorder(new Color(245, 245, 245), 2));
@@ -2623,7 +2608,6 @@ public class Sistema extends javax.swing.JFrame {
         String desc = descValue.toString();
 
         String codi = TableProducto.getValueAt(filaSeleccionada, model.findColumn("CODIGO")).toString();
-        // TODO: Popular desplegable de proveedores
         String proveedor = "";//TableProducto.getValueAt(filaSeleccionada, model.findColumn("PROVEEDOR")).toString();
         String categoria = TableProducto.getValueAt(filaSeleccionada, model.findColumn("CATEGORIA")).toString();
         String ID = TableProducto.getValueAt(filaSeleccionada, model.findColumn("ID")).toString();
@@ -2661,8 +2645,6 @@ public class Sistema extends javax.swing.JFrame {
         DefaultTableModel modelProveedores = (DefaultTableModel) productProveedoresTable.getModel();
         
         List<PrecioProveedorProducto> providersProducts = this.productosService.getProvidersByProduct(Integer.parseInt(ID));
-        
-        // TODO: Fix providers no session
         for (PrecioProveedorProducto ppp: providersProducts) {
             modelProveedores.addRow(
                 new Object[]{
@@ -2826,8 +2808,6 @@ public class Sistema extends javax.swing.JFrame {
             }
 
             try {
-                // TODO: Se puede cargar un varias veces un producto pero con diferentes proveedores?
-                // o permitimos cargar el producto una sola vez y luego agregar todos los proveedores que querramos?
 
                 productosService.searchByCodigo(form.validatedForm.code);
                 productsErrorDisplay.setText("<html>El producto con el codigo " + codigo + " ya existe</html>");
@@ -3051,49 +3031,6 @@ public class Sistema extends javax.swing.JFrame {
         productosPCPTable.setModel(modeloPCP);
         
         providerIDPCP.setText(providerID + "");
-        ///////////////////////////////////////
-        
-//        for (String selectedProduct: selectedProducts) {
-//            String cleanedProductCode = selectedProduct
-//                    .replaceAll("<[^>]*>", "")
-//                    .replaceAll(".*Codigo:", "")
-//                    .strip();
-//            
-//            // TODO: Para cada producto solicitar el precio
-////            String userInput = JOptionPane.showInputDialog("Precio de compra para " +  + ":");
-//            
-//            try{
-//                Product productFound = this.productosService.searchByCodigo(cleanedProductCode);
-//                Provider providerFound = this.productosService.getProviderByID(providerID);
-//
-//                PrecioProveedorProducto pppFound = this.productosService.getPrecioProveedorProducto(providerID, productFound.getId());
-//
-//                if (pppFound == null) {
-//                    
-//                    this.productosService.addPrecioProveedorProducto(
-//                        new PrecioProveedorProducto.PrecioProveedorProductoId(productFound.getId(), providerFound.getId()),
-//                        0.0 // TODO: Tomar el precio que ingrese el usuario para cada producto
-//                    );
-//                    
-//                    JOptionPane.showMessageDialog(
-//                        modalProviderLinkProductos,
-//                        "Producto " +
-//                        cleanedProductCode +
-//                        " vinculado al proveedor " +
-//                        taxPayerID
-//                    );
-//                    
-//                    
-//                } else {
-//                    JOptionPane.showMessageDialog(modalProviderLinkProductos, "El producto ya se encuentra vinculado al proveedor");
-//                }
-//
-//            } catch(Exception ex) {
-//                JOptionPane.showMessageDialog(null, ex.getMessage());
-//            }
-//        }
-//        modalProviderLinkProductsFrame.setVisible(false);
-//        LoadProductsForProviderTable(providerID);
 
     }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -3130,7 +3067,6 @@ public class Sistema extends javax.swing.JFrame {
             String value = productosPCPTable.getValueAt(i, 2).toString();
             try {
                 double parsedPrice = Double.parseDouble(value);
-                // TODO: Setear flag para indicar error
                 toPersist.add(
                     new Pair(productosPCPTable.getValueAt(i, 0).toString(), parsedPrice)
                 );
@@ -3163,7 +3099,7 @@ public class Sistema extends javax.swing.JFrame {
 
                         this.productosService.addPrecioProveedorProducto(
                             new PrecioProveedorProducto.PrecioProveedorProductoId(productFound.getId(), providerFound.getId()),
-                            item.b // TODO: Tomar el precio que ingrese el usuario para cada producto
+                            item.b
                         );
 
                         JOptionPane.showMessageDialog(
