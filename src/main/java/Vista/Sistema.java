@@ -2666,6 +2666,29 @@ public class Sistema extends javax.swing.JFrame {
 
     private void btnEliminarproActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarproActionPerformed
         // TODO add your handling code here:
+        if (TableProducto.getSelectedRowCount() < 1) {
+            return;
+        }
+        
+        int[] rows = TableProducto.getSelectedRows();
+        
+        DefaultTableModel model = (DefaultTableModel) TableProducto.getModel();
+        
+        for(int i = 0; i < rows.length; i++){
+            int productID = Integer.parseInt(TableProducto.getValueAt(rows[i], model.findColumn("ID")).toString());
+            
+            try {
+                
+                productosService.setProductEnabled(productID, false);
+                
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, ex.toString());
+            }
+            
+        }
+        
+        LimpiarTable(model);
+        LoadProductos();
     }//GEN-LAST:event_btnEliminarproActionPerformed
 
     private void btnLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarActionPerformed

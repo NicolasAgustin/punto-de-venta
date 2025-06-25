@@ -202,6 +202,36 @@ public class ProductsService {
         } 
     }
     
+    
+    public void setProductEnabled(int id, boolean value){
+        Session session = null;
+        
+        try {
+            session = this.store.createSession(); 
+            session.beginTransaction();
+            
+            Product product = session.find(Product.class, id);
+            
+            product.setEnabled(value);
+            
+            session.merge(product);
+            
+            session.getTransaction().commit();
+            
+        } catch (Exception ex) {
+            if (session != null && session.getTransaction().isActive()) {
+                session.getTransaction().rollback(); // Rollback en caso de error
+            }
+            System.err.println("Error: " + ex.getMessage()); // Usa System.err para errores
+            
+        } finally {
+            if (session != null && session.isOpen()) {
+                session.close(); // Cierra la sesión
+            }
+        }     
+    }
+    
+    
     public Provider getProviderByTaxPayerID(String taxPayerID) {
         Session session = null;
         
