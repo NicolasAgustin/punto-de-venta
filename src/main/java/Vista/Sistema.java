@@ -2367,8 +2367,8 @@ public class Sistema extends javax.swing.JFrame {
         } catch (Exception ex) {  
            
             JOptionPane.showMessageDialog(modalUpdateFrame, "Por favor, ingrese un precio válido.");
-            PrecioUni.setBorder(new LineBorder(Color.RED, 2));
-            PrecioUni.setText(prodToUpdate.getUnitaryPrice() + "");
+//            PrecioUni.setBorder(new LineBorder(Color.RED, 2));
+            PrecioUni.setText(prodToUpdate.getPublicSalePrice() + "");
             return;
             
         }
@@ -2382,7 +2382,7 @@ public class Sistema extends javax.swing.JFrame {
             prodToUpdate.setInitialQuantity(nuevaCantIni);
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(modalUpdateFrame, "Por favor, ingrese una cantidad inicial valida.");
-            CantInici.setBorder(new LineBorder(Color.RED, 2));
+//            CantInici.setBorder(new LineBorder(Color.RED, 2));
             CantInici.setText(prodToUpdate.getInitialQuantity() + "");
             return;
         }
@@ -2392,7 +2392,7 @@ public class Sistema extends javax.swing.JFrame {
         //Validar Titulo:
         if (nuevoTitulo.isEmpty()) {
             JOptionPane.showMessageDialog(modalUpdateFrame, "Por favor ingresa un Título válido.");
-            Titulo.setBorder(new LineBorder(Color.RED, 2));
+//            Titulo.setBorder(new LineBorder(Color.RED, 2));
             Titulo.setText(prodToUpdate.getTitle());
             return; // Salir del método o tomar otras acciones según sea necesario
         }
