@@ -2787,6 +2787,10 @@ public class Sistema extends javax.swing.JFrame {
     private void btnSaveProductoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveProductoActionPerformed
         // JENI
         List<javax.swing.JTextField> componentsToNormalize = findComponentsWithErrors(jPanel5);
+        
+        for (javax.swing.JTextField component: componentsToNormalize) {
+            component.setBorder(DEFAULT_BORDER);
+        }
         try {
             String codigo = txtCod.getText();
             boolean castEstado = true;
