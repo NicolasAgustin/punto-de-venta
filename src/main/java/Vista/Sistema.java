@@ -37,6 +37,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import static java.lang.Math.round;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -703,6 +705,11 @@ public class Sistema extends javax.swing.JFrame {
         });
 
         paymentCashVuelto.setEnabled(false);
+        paymentCashVuelto.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                paymentCashVueltoActionPerformed(evt);
+            }
+        });
 
         btnCashConfirm.setBackground(new java.awt.Color(102, 102, 255));
         btnCashConfirm.setFont(new java.awt.Font("Calibri", 1, 14)); // NOI18N
@@ -2040,6 +2047,8 @@ public class Sistema extends javax.swing.JFrame {
         
         try {
             // Esto tarda un poco y es muy poco descriptivo
+            // TODO: No se estan persistiendo las ventas si hago una nueva venta con
+            // el mismo detalle de productos
             ventasService.add(tmpVenta, "Cash");
         } catch (Exception ex) {
 
@@ -2069,6 +2078,10 @@ public class Sistema extends javax.swing.JFrame {
         
         ClearVentaInputs();
         LimpiarTable((DefaultTableModel) TableVenta.getModel());
+        
+        // Reset tmp venta
+        btnSaveSale.setEnabled(false);
+        this.tmpVenta = new Sale();
     }//GEN-LAST:event_btnCashConfirmActionPerformed
 
     private void txtDescActionPerformed(java.awt.event.ActionEvent evt) {
@@ -2171,9 +2184,17 @@ public class Sistema extends javax.swing.JFrame {
         paymentCashMonto.setText(this.tmpVenta.getTotal() + "");
 
         // Inicializamos el modal
-        modalFrame.getContentPane().add(PaymentMethodPanel);
-        modalFrame.pack();
-        modalFrame.setVisible(true);
+//        modalFrame.getContentPane().add(PaymentMethodPanel);
+//        modalFrame.pack();
+//        modalFrame.setVisible(true);
+        initializeModalWithPanel(modalFrame, PaymentMethodPanel, true);
+        modalFrame.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                paymentCashMonto.setText("0.0");
+                paymentCashPago.setText("");
+                paymentCashVuelto.setText("");
+            }
+        });
 
         // Esto se ejecuta cada vez que se ingresa informacion en el textbox
         paymentCashPago.addKeyListener(new KeyListener() {
@@ -3164,6 +3185,10 @@ public class Sistema extends javax.swing.JFrame {
         }
         
     }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void paymentCashVueltoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_paymentCashVueltoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_paymentCashVueltoActionPerformed
 
     /**
      * @param args the command line arguments
