@@ -32,7 +32,7 @@ public class Detail {
     @Column(name = "id")
     private Long id;
     
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "product_id", referencedColumnName = "id")
     private Product product;
     
@@ -167,6 +167,7 @@ public class Detail {
         this.subtotal += detail.subtotal;
         // Is an error to sumarize the amount of iva
         // this.iva += detail.iva;
+        
         this.total += detail.total;
         this.total = Utils.roundDouble(this.total);
     }

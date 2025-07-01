@@ -69,6 +69,7 @@ public class Sale implements BaseTableModel {
     
     /////// ESTA LOGICA DEBERIA ESTAR EN VENTAS-SERVICE
     public void addDetail(Detail prod) {
+        prod.setSale(this);
         this.detail.add(prod);
         this.total += prod.getTotal();
         this.total = Utils.roundDouble(this.total);

@@ -78,6 +78,7 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
+import org.h2.tools.Server;
 import org.hibernate.Session;
 
 
@@ -135,6 +136,12 @@ public class Sistema extends javax.swing.JFrame {
         this.setLocationRelativeTo(null);
 //        btnSaveProducto.setEnabled(false);//Este boton al proncipio esta deshabilitado
 
+        try {
+            Server h2WebServer = Server.createWebServer("-webAllowOthers", "-tcpAllowOthers").start(); // Opcional: permiten conexiones desde otras máquinas
+            System.out.println("H2 Console started at: " + h2WebServer.getURL());
+        } catch (Exception ex) {
+            
+        }
         updateEnabledGroup.add(btnUpdateEnabled);
         updateEnabledGroup.add(btnUpdateEnabled1);
         
