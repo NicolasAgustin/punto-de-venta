@@ -186,7 +186,7 @@ public class Sistema extends javax.swing.JFrame {
                 return columns[index];
             }
         });
-
+        
         TableProvider.setModel(new DefaultTableModel() {
             String[] columns = Provider.getColumnNames();
 
@@ -1938,6 +1938,8 @@ public class Sistema extends javax.swing.JFrame {
 
         principalPanel.addTab("Proveedores", proveedoresPanel);
 
+        principalPanel.setSelectedIndex(1);
+
         getContentPane().add(principalPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 140, 1010, 510));
 
         pack();
@@ -1946,6 +1948,17 @@ public class Sistema extends javax.swing.JFrame {
     private void menuVentasBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuVentasBtnActionPerformed
         // TODO add your handling code here:
 
+        try{
+            int products_qty = this.productosService.list().size();
+            if (products_qty == 0){
+                JOptionPane.showMessageDialog(nuevaVentaPanel, "No hay productos cargados en el sistema.\nNo se pueden realizar ventas.");
+                return;
+            }
+        } catch (Exception ex) {
+            
+        }
+        
+        
         principalPanel.setSelectedIndex(0);
         this.tmpVenta = new Sale();
         LimpiarTable((DefaultTableModel) TableVenta.getModel());
@@ -2189,7 +2202,9 @@ public class Sistema extends javax.swing.JFrame {
 
         // Casteo a string
         paymentCashMonto.setText(this.tmpVenta.getTotal() + "");
-
+        paymentCashErrorLabel.setText("");
+        paymentCashPago.setBorder(new LineBorder(Color.GRAY, 1));
+        
         // Inicializamos el modal
 //        modalFrame.getContentPane().add(PaymentMethodPanel);
 //        modalFrame.pack();
@@ -2209,40 +2224,43 @@ public class Sistema extends javax.swing.JFrame {
             public void keyReleased(KeyEvent e) {
 
                 if (paymentCashPago.getText().equals("")) {
+                    paymentCashErrorLabel.setForeground(Color.RED);
+                    paymentCashErrorLabel.setText("Ingresar un monto valido.");
+                    btnCashConfirm.setEnabled(false);
                     return;
                 }
 
                 paymentCashErrorLabel.setText("");
                 paymentCashPago.setBorder(new LineBorder(Color.GRAY, 1));
-
-                String filteredPaymentCashValue = paymentCashPago.getText().replaceAll("\\D", "");
                 
-                if (filteredPaymentCashValue.equals("")){
+                try{
+                    Float pago = Float.parseFloat(
+                        paymentCashPago.getText().replaceAll("\\D", "")
+                    );
+                    
+                    if (pago < tmpVenta.getTotal()) {
+                        paymentCashErrorLabel.setForeground(Color.RED);
+                        paymentCashErrorLabel.setText("El pago es menor al monto a pagar.");
+                        paymentCashPago.setBorder(new LineBorder(Color.RED, 2));
+                        btnCashConfirm.setEnabled(false);
+                        return;
+                    }
+
+                    double diff = pago - tmpVenta.getTotal();
+
+                    if (diff < 0) {
+                        paymentCashPago.setBorder(new LineBorder(Color.RED, 2));
+                        btnCashConfirm.setEnabled(false);
+                        return;
+                    }
+                    paymentCashVuelto.setText(diff + "");
+                    btnCashConfirm.setEnabled(true);
+                } catch (NumberFormatException ex) {
                     paymentCashErrorLabel.setForeground(Color.RED);
                     paymentCashErrorLabel.setText("Debe ingresar un valor numerico valido.");
                     paymentCashPago.setBorder(new LineBorder(Color.RED, 2));
                     return;
                 }
-                
-                Float pago = Float.parseFloat(
-                    paymentCashPago.getText().replaceAll("\\D", "")
-                );
-
-                if (pago < tmpVenta.getTotal()) {
-                    paymentCashErrorLabel.setForeground(Color.RED);
-                    paymentCashErrorLabel.setText("El pago es menor al monto a pagar.");
-                    paymentCashPago.setBorder(new LineBorder(Color.RED, 2));
-                    return;
-                }
-
-                double diff = pago - tmpVenta.getTotal();
-
-                if (diff < 0) {
-                    paymentCashPago.setBorder(new LineBorder(Color.RED, 2));
-                    return;
-                }
-
-                paymentCashVuelto.setText(diff + "");
             }
 
             @Override
