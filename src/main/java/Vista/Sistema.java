@@ -2369,25 +2369,23 @@ public class Sistema extends javax.swing.JFrame {
     private void paymentCashPagoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_paymentCashPagoActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_paymentCashPagoActionPerformed
-
+    
     private void BtnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnCancelarActionPerformed
        //esto se lo agregue porque si quiero cancelar queda pintado de rojo entonces esto lo deja en gris
-        PrecioUni.setBorder(new LineBorder(new Color(245, 245, 245), 2));
-        CantInici.setBorder(new LineBorder(new Color(245, 245, 245), 2));
-        Titulo.setBorder(new LineBorder(new Color(245, 245, 245), 2));
-        Desc.setBorder(new LineBorder(new Color(245, 245, 245), 2));
+        PrecioUni.setBorder(DEFAULT_BORDER);
+        CantInici.setBorder(DEFAULT_BORDER);
+        Titulo.setBorder(DEFAULT_BORDER);
+        Desc.setBorder(DEFAULT_BORDER);
         modalUpdateFrame.setVisible(false);
     }//GEN-LAST:event_BtnCancelarActionPerformed
 
     //BOTON ACEPTAR
     private void btnAceptarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAceptarActionPerformed
         
-        // Eliminar el borde rojo de todos los campos de entrada
-      
-        PrecioUni.setBorder(new LineBorder(new Color(245, 245, 245), 2));
-        CantInici.setBorder(new LineBorder(new Color(245, 245, 245), 2));
-        Titulo.setBorder(new LineBorder(new Color(245, 245, 245), 2));
-        Desc.setBorder(new LineBorder(new Color(245, 245, 245), 2));
+        PrecioUni.setBorder(DEFAULT_BORDER);
+        CantInici.setBorder(DEFAULT_BORDER);
+        Titulo.setBorder(DEFAULT_BORDER);
+        Desc.setBorder(DEFAULT_BORDER);
         String productoCodigo = jLabelCod.getText();
         
 //        int productId = Integer.parseInt(labelUpdateID.getText());
@@ -2408,12 +2406,20 @@ public class Sistema extends javax.swing.JFrame {
 
         try {
             nuevoPrecioUni = Float.parseFloat(PrecioUni.getText());
+            
+            if (nuevoPrecioUni < 0) {
+                JOptionPane.showMessageDialog(modalUpdateFrame, "El precio unitario no puede ser negativo.");
+                PrecioUni.setBorder(new LineBorder(Color.RED, 2));
+                PrecioUni.setText(prodToUpdate.getPublicSalePrice() + "");
+                return;
+            }
+            
             prodToUpdate.setUnitaryPrice(nuevoPrecioUni);
             
         } catch (Exception ex) {  
            
             JOptionPane.showMessageDialog(modalUpdateFrame, "Por favor, ingrese un precio válido.");
-//            PrecioUni.setBorder(new LineBorder(Color.RED, 2));
+            PrecioUni.setBorder(new LineBorder(Color.RED, 2));
             PrecioUni.setText(prodToUpdate.getPublicSalePrice() + "");
             return;
             
@@ -2425,10 +2431,18 @@ public class Sistema extends javax.swing.JFrame {
         try {
          
             nuevaCantIni = Integer.parseInt(CantInici.getText());
+            
+            if (nuevaCantIni < 0) {
+                JOptionPane.showMessageDialog(modalUpdateFrame, "La cantidad inicial no puede ser negativa.");
+                CantInici.setBorder(new LineBorder(Color.RED, 2));
+                CantInici.setText(prodToUpdate.getInitialQuantity() + "");
+                return;
+            }
+            
             prodToUpdate.setInitialQuantity(nuevaCantIni);
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(modalUpdateFrame, "Por favor, ingrese una cantidad inicial valida.");
-//            CantInici.setBorder(new LineBorder(Color.RED, 2));
+            CantInici.setBorder(new LineBorder(Color.RED, 2));
             CantInici.setText(prodToUpdate.getInitialQuantity() + "");
             return;
         }
@@ -2438,7 +2452,7 @@ public class Sistema extends javax.swing.JFrame {
         //Validar Titulo:
         if (nuevoTitulo.isEmpty()) {
             JOptionPane.showMessageDialog(modalUpdateFrame, "Por favor ingresa un Título válido.");
-//            Titulo.setBorder(new LineBorder(Color.RED, 2));
+            Titulo.setBorder(new LineBorder(Color.RED, 2));
             Titulo.setText(prodToUpdate.getTitle());
             return; // Salir del método o tomar otras acciones según sea necesario
         }
