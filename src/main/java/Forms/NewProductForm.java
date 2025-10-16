@@ -46,17 +46,17 @@ public class NewProductForm {
         int initialQuantity = 0;
         
         if (this.title.equals("")) {
-            errors.add(new FormError("El campo titulo es obligatorio", "field1"));
+            errors.add(new FormError("El campo titulo no puede estar vacio", "field1"));
         }
         
         if (this.code.equals("")) {
-            errors.add(new FormError("El campo codigo es obligatorio", "field3"));
+            errors.add(new FormError("El campo codigo no puede estar vacio", "field3"));
         }
         
         try {
             publicSalePrice = Float.parseFloat(this.publicSalePrice);
             if (publicSalePrice <= 0) {
-                errors.add(new FormError("El precio de venta debe ser un numero mayor a cero", "field4"));
+                errors.add(new FormError("El campo precio de venta debe ser un numero mayor a cero", "field4"));
             }
         } catch(NumberFormatException ex) {
             if (this.publicSalePrice.equals("")){
@@ -77,10 +77,14 @@ public class NewProductForm {
             
         } catch(NumberFormatException ex) {
             if (this.initial_quantity.equals("")){
-                errors.add(new FormError("El campo precio de venta no puede estar vacio", "field5"));
+                errors.add(new FormError("El campo cantidad inicial no puede estar vacio", "field5"));
             } else {   
                 errors.add(new FormError("Error de formato en campo cantidad inicial", "field5"));
             }
+        }
+        
+        if (this.description.length() >= 100) {
+            errors.add(new FormError("El campo descripcion debe tener como maximo una longitud de 100 caracteres", "field2"));
         }
         
         if (errors.size() == 0) {

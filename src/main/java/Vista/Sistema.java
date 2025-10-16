@@ -2734,6 +2734,20 @@ public class Sistema extends javax.swing.JFrame {
         
         DefaultTableModel model = (DefaultTableModel) TableProducto.getModel();
         
+        StringBuilder builder = new StringBuilder();
+        
+        
+        for(int i = 0; i < rows.length; i++){
+            String productName = TableProducto.getValueAt(rows[i], model.findColumn("TITULO")).toString();
+            String productCode = TableProducto.getValueAt(rows[i], model.findColumn("CODIGO")).toString();
+            
+            builder.append(productCode + " " + productName + "\n");
+        }
+        
+        int option = JOptionPane.showConfirmDialog(this, "Confirme la deshabilitacion de los siguientes productos:\n " + builder, "Confirmacion", JOptionPane.YES_NO_OPTION);
+        
+        if (option == JOptionPane.NO_OPTION) return;
+        
         for(int i = 0; i < rows.length; i++){
             int productID = Integer.parseInt(TableProducto.getValueAt(rows[i], model.findColumn("ID")).toString());
             
@@ -2742,7 +2756,9 @@ public class Sistema extends javax.swing.JFrame {
                 productosService.setProductEnabled(productID, false);
                 
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, ex.toString());
+                String productName = TableProducto.getValueAt(rows[i], model.findColumn("TITULO")).toString();
+                String productCode = TableProducto.getValueAt(rows[i], model.findColumn("CODIGO")).toString();
+                JOptionPane.showMessageDialog(this, "No se pudo deshabilitar el producto " + productName + " " + productCode + ": " + ex.toString());
             }
             
         }
