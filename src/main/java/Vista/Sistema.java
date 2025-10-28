@@ -2253,13 +2253,15 @@ public class Sistema extends javax.swing.JFrame {
                         btnCashConfirm.setEnabled(false);
                         return;
                     }
-                    paymentCashVuelto.setText(diff + "");
+                    BigDecimal bd = BigDecimal.valueOf(diff);
+                    bd = bd.setScale(2, RoundingMode.HALF_UP);
+                    
+                    paymentCashVuelto.setText(bd.doubleValue() + "");
                     btnCashConfirm.setEnabled(true);
                 } catch (NumberFormatException ex) {
                     paymentCashErrorLabel.setForeground(Color.RED);
                     paymentCashErrorLabel.setText("Debe ingresar un valor numerico valido.");
                     paymentCashPago.setBorder(new LineBorder(Color.RED, 2));
-                    return;
                 }
             }
 

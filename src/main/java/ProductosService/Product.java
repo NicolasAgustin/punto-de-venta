@@ -17,6 +17,8 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -105,7 +107,7 @@ public class Product implements BaseTableModel {
     ) {
        
         this.id = id;
-        this.publicSalePrice = publicSalePrice;
+        this.publicSalePrice = BigDecimal.valueOf(publicSalePrice).setScale(2, RoundingMode.HALF_UP).doubleValue();
         this.initialQuantity = initialQuantity;
         this.title = title;
         this.description = descripcion;
