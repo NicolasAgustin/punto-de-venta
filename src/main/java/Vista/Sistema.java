@@ -2171,6 +2171,19 @@ public class Sistema extends javax.swing.JFrame {
                 return;
             }
             
+            Detail currentProductDetail = null;
+            
+            for (Detail detail: this.tmpVenta.getDetail()){
+                if (detail.getProducto().getCode().equals(codigoBarras)){
+                    currentProductDetail = detail;
+                }
+            }
+            
+            if (currentProductDetail != null && prodFound.getInitialQuantity() < currentProductDetail.getQuantity() + cantidad){
+                JOptionPane.showMessageDialog(null, "No se puede agregar el producto, stock insuficiente.");
+                return;
+            }
+            
             Detail detalle = this.ventasService.createDetalle(prodFound, cantidad);
 
             // Revisamos si hay que juntar el detalle con otro existente
